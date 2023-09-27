@@ -1,4 +1,4 @@
-package com.gdsc.moa.global.jwt.token;
+package com.gdsc.moa.global.jwt;
 
 import com.gdsc.moa.global.jwt.dto.TokenResponse;
 import com.gdsc.moa.global.jwt.oauth.UserInfo;

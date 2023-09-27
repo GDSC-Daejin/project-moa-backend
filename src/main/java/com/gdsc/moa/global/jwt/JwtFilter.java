@@ -1,6 +1,5 @@
-package com.gdsc.moa.global.jwt.filter;
+package com.gdsc.moa.global.jwt;
 
-import com.gdsc.moa.global.jwt.token.TokenProvider;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

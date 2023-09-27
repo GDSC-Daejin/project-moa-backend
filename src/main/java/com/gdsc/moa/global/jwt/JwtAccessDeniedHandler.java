@@ -1,4 +1,4 @@
-package com.gdsc.moa.global.jwt.handler;
+package com.gdsc.moa.global.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;

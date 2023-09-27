@@ -1,7 +1,7 @@
 package com.gdsc.moa.global.config;
 
-import com.gdsc.moa.global.jwt.token.TokenProvider;
-import com.gdsc.moa.global.jwt.filter.JwtFilter;
+import com.gdsc.moa.global.jwt.TokenProvider;
+import com.gdsc.moa.global.jwt.JwtFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.config.annotation.SecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;

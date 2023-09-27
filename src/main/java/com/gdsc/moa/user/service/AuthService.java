@@ -5,7 +5,7 @@ import com.gdsc.moa.global.jwt.dto.KakaoUserInfo;
 import com.gdsc.moa.global.jwt.dto.KakaoUserResponse;
 import com.gdsc.moa.global.jwt.dto.OauthToken;
 import com.gdsc.moa.global.jwt.dto.TokenResponse;
-import com.gdsc.moa.global.jwt.token.TokenProvider;
+import com.gdsc.moa.global.jwt.TokenProvider;
 import com.gdsc.moa.user.entity.RoleType;
 import com.gdsc.moa.user.entity.UserEntity;
 import com.gdsc.moa.user.repository.UserRepository;
