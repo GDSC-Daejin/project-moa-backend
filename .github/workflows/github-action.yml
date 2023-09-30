@@ -46,7 +46,7 @@ jobs:
       with:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.HOSTNAME }}
-        password: ${{ secrets.KEY }}
+        key: ${{ secrets.KEY }}
         port: 50022
         script: |
           cd /home/jsangmin/moa
