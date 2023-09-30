@@ -48,6 +48,7 @@ jobs:
         username: jsangmin99
         key: ${{ secrets.KEY }}
         script: |
+          cd /home/jsangmin/moa
           docker stop $(docker ps -q --filter name=${{ secrets.DOCKER_REPO }}-app)
           docker rm $(docker ps -qa --filter name=${{ secrets.DOCKER_REPO }}-app) || true
           sudo docker pull ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }}:app
