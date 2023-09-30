@@ -1,0 +1,60 @@
+name: Java CI with Gradle
+on:
+  push:
+    branches: [ "feature/configSetting", "main"]
+permissions:
+  contents: read
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+
+    ## create application-prod.properties
+    - name: make application-prod.properties
+      if: contains(github.ref, 'feature/configSetting')
+      run: |
+          cd ./src/main/resources
+          touch ./application-dev.yml
+          echo "${{ secrets.PROPERTIES_DEV }}" > ./application-dev.yml
+      shell: bash
+
+    ## gradle build
+    - name: Build with Gradle
+      run: ./gradlew clean build
+    
+    ## docker build & push to production
+    - name: Docker build & push to prod
+      if: contains(github.ref, 'feature/configSetting')
+      run: |
+          docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }}:prod .
+          docker push ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }}:prod
+  ## docker compose up
+    - name: executing remote ssh commands using password
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.HOST }}
+        username: jsangmin99
+        key: ${{ secrets.KEY }}
+        script: |
+          sudo docker rm -f $(docker ps -qa)
+          sudo docker pull ${{ secrets.DOCKER_REPO }}/moa-web
+          sudo docker pull ${{ secrets.DOCKER_REPO }}/moa-nginx
+          docker-compose up -d
+          docker image prune -f
+            sudo docker rm -f $(docker ps -a -q)
+            sudo docker pull jsangmin99/project-blended-backend:dev
+            docker-compose up -d
+            docker image prune -f
