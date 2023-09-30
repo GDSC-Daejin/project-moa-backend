@@ -21,8 +21,8 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
 
-    ## create application-prod.properties
-    - name: make application-prod.properties
+    ## create application-dev.properties
+    - name: make application-dev.properties
       if: contains(github.ref, 'feature/configSetting')
       run: |
           cd ./src/main/resources
@@ -40,8 +40,7 @@ jobs:
       run: |
           docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
           docker build -t ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }}:app .
-          docker push ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }}:app
-  ## docker compose up
+          docker push ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }}:app  ## docker compose up
     - name: executing remote ssh commands using password
       uses: appleboy/ssh-action@master
       with:
@@ -49,7 +48,9 @@ jobs:
         username: jsangmin99
         key: ${{ secrets.KEY }}
         script: |
-          sudo docker rm -f $(docker ps -qa)
+          docker stop ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }}:app
+          docker rm ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }}:app
+          continue-on-error: true
           sudo docker pull ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }}:app
           docker-compose up -d
           docker image prune -f
