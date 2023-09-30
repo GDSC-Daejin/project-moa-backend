@@ -50,8 +50,7 @@ jobs:
         port: 50022
         script: |
           cd /home/jsangmin/moa
-          docker stop $(docker ps -q --filter name=${{ secrets.DOCKER_REPO }}-app)
-          docker rm $(docker ps -qa --filter name=${{ secrets.DOCKER_REPO }}-app) || true
+          docker-compose down --rmi local
           docker pull ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }}:app
           docker-compose up -d
           docker image prune -f
