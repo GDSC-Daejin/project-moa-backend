@@ -46,7 +46,8 @@ jobs:
       with:
         host: ${{ secrets.HOST }}
         username: jsangmin99
-        key: ${{ secrets.KEY }}
+        password: ${{ secrets.KEY }}
+        port: 50022
         script: |
           cd /home/jsangmin/moa
           docker stop $(docker ps -q --filter name=${{ secrets.DOCKER_REPO }}-app)
