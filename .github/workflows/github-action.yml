@@ -45,7 +45,7 @@ jobs:
       uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.HOST }}
-        username: jsangmin
+        username: ${{ secrets.HOSTNAME }}
         password: ${{ secrets.KEY }}
         port: 50022
         script: |
