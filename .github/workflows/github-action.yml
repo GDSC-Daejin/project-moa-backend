@@ -48,9 +48,13 @@ jobs:
         username: jsangmin99
         key: ${{ secrets.KEY }}
         script: |
-          docker stop $(docker ps -q --filter name=${{ secrets.DOCKER_REPO }}-app)
+          cd /home/jsangmin/moa
+          CONTAINER_NAME="${{ secrets.DOCKER_REPO }}-app"
+          if [ -n "$(docker ps -a -q --filter name=$CONTAINER_NAME)" ]; then
+          docker stop $CONTAINER_NAME
+          fi
           docker rm $(docker ps -qa --filter name=${{ secrets.DOCKER_REPO }}-app) || true
-          sudo docker pull ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }}:app
+          docker pull ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }}:app
           docker-compose up -d
           docker image prune -f
       continue-on-error: true
