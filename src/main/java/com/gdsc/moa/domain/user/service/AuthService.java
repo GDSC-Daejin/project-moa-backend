@@ -1,19 +1,21 @@
-package com.gdsc.moa.user.service;
+package com.gdsc.moa.domain.user.service;
 
 import com.gdsc.moa.api.controller.KakaoOAuth2;
-import com.gdsc.moa.global.jwt.dto.KakaoUserInfo;
+import com.gdsc.moa.domain.user.entity.UserEntity;
+import com.gdsc.moa.domain.user.info.impl.KakaoOAuth2UserInfo;
+import com.gdsc.moa.domain.user.repository.UserRepository;
 import com.gdsc.moa.global.jwt.dto.KakaoUserResponse;
 import com.gdsc.moa.global.jwt.dto.OauthToken;
 import com.gdsc.moa.global.jwt.dto.TokenResponse;
 import com.gdsc.moa.global.jwt.TokenProvider;
-import com.gdsc.moa.user.entity.RoleType;
-import com.gdsc.moa.user.entity.UserEntity;
-import com.gdsc.moa.user.repository.UserRepository;
+import com.gdsc.moa.domain.user.entity.RoleType;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
+import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.text.translate.NumericEntityUnescaper.OPTION;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -32,10 +34,15 @@ public class AuthService {
     private final UserRepository userRepository;
     private final TokenProvider tokenProvider;
 
+    public TokenResponse kakaoLogin(String authorizedCode) throws JsonProcessingException {
+        log.info("kakaoLogin 호출");
+        // 넘어온 인가 코드를 통해 access_token 발급
+        OauthToken oauthToken = getKakaoOauthToken(authorizedCode);
+        // 발급 받은 accessToken 으로 카카오 회원 정보 DB 저장
+        return saveUserAndGetToken(oauthToken.getAccess_token());
+    }
 
-
-
-    public OauthToken getKakaoOauthToken(String authorizedCode)  {
+    public OauthToken getKakaoOauthToken(String authorizedCode) throws JsonProcessingException {
         log.info("getAccessToken 호출");
         // HttpHeader 오브젝트 생성
         HttpHeaders headers = new HttpHeaders();
@@ -57,39 +64,50 @@ public class AuthService {
         log.info("카카오 토큰 요청");
         // Http 요청하기, Post방식으로, 그리고 response 변수의 응답 받음
         /// TODO: 2023/09/26 여기가 문제다 시벌
-        ResponseEntity<String> response = rt.exchange(
-                "https://kauth.kakao.com/oauth/token",
-                HttpMethod.POST,
-                kakaoTokenRequest,
-                String.class
-        );
+        ResponseEntity<String> response = null;
+        try {
+            response = rt.exchange(
+                    "https://kauth.kakao.com/oauth/token",
+                    HttpMethod.POST,
+                    kakaoTokenRequest,
+                    String.class
+            );
+        }
+        catch (Exception e) {
+            log.error("카카오 토큰 요청 실패");
+            log.error(e.getMessage());
+        }
+
         log.info("response: {}", response);
         log.info("카카오 토큰 요청 완료");
-        // JSON -> 액세스 토큰 파싱
-        String tokenJson = response.getBody();
-        Gson gson = new Gson();
-        OauthToken tokenResponse = gson.fromJson(tokenJson, OauthToken.class);
 
+        OauthToken tokenResponse = null;
+        try {
+            // JSON -> 액세스 토큰 파싱
+            String tokenJson = response.getBody();
+            Gson gson = new Gson();
+            tokenResponse = gson.fromJson(tokenJson, OauthToken.class);
+        } catch (Exception e) {
+            log.error("파싱 실패");
+            log.error(e.getMessage());
+        }
         return tokenResponse;
     }
-    public TokenResponse SaveUserAndGetToken(String access_token) {
-        KakaoUserInfo profile = getUserInfoByToken(access_token);
+    public TokenResponse saveUserAndGetToken(String access_token) {
+        KakaoOAuth2UserInfo profile = getUserInfoByToken(access_token);
 
-        UserEntity user = userRepository.findByEmail(profile.getEmail());
-        if(user == null) {
-            user = UserEntity.builder()
-                    .kakaoEmail(profile.getEmail())
-                    .kakaoNickname(profile.getNickname())
-                    .kakaoProfileImg(profile.getProfileImageUrl())
-                    .userRole(RoleType.MEMBER)
-                    .build();
-
-            userRepository.save(user);
-        }
+        UserEntity user = checkUserByEmail(profile.getEmail());
+        userRepository.save(user);
 
         return createToken(user);
     }
 
+
+    private UserEntity checkUserByEmail(String email) {
+        return userRepository.findByEmail(email).orElse(null);
+    }
+
+    //TODO : 얘는 토큰 Provider로 옮기기
     private TokenResponse createToken(UserEntity user) {
         return tokenProvider.generateJwtToken(user.getEmail(), user.getNickname(), RoleType.MEMBER);
 
@@ -104,7 +122,7 @@ public class AuthService {
          */
     }
 
-    private KakaoUserInfo getUserInfoByToken(String accessToken) {
+    private KakaoOAuth2UserInfo getUserInfoByToken(String accessToken) {
         // HttpHeader 오브젝트 생성
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Bearer " + accessToken);
@@ -135,7 +153,7 @@ public class AuthService {
         log.info("Kakao API kakaoUserResponse: {}", kakaoProfile);
 
         //가져온 사용자 정보를 객체로 만들어서 반환
-        return new KakaoUserInfo(kakaoProfile.getKakao_account().getEmail(), kakaoProfile.getKakao_account().getProfile().getNickname(), kakaoProfile.getProperties().getProfile_image());
+        return new KakaoOAuth2UserInfo(kakaoProfile);
     }
 
     /*

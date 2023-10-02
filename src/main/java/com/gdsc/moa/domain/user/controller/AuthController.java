@@ -1,12 +1,13 @@
-package com.gdsc.moa.user.controller;
+package com.gdsc.moa.domain.user.controller;
 
-import com.gdsc.moa.global.jwt.dto.OauthToken;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.gdsc.moa.global.dto.MoaApiResponse;
 import com.gdsc.moa.global.jwt.dto.TokenResponse;
-import com.gdsc.moa.user.service.AuthService;
+import com.gdsc.moa.domain.user.service.AuthService;
+import com.gdsc.moa.global.message.UserMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -28,15 +29,12 @@ public class AuthController {
 
 
     @GetMapping("/user/kakao")
-    public ResponseEntity<TokenResponse> kakaoLogin(String code)   {
+    public MoaApiResponse<TokenResponse> kakaoLogin(String code) throws JsonProcessingException {
         // code는 카카오 서버로부터 받은 인가 코드
-        log.info("kakaoLogin");
         // 넘어온 인가 코드를 통해 access_token 발급
-        OauthToken oauthToken = authService.getKakaoOauthToken(code);
-        // 발급 받은 accessToken 으로 카카오 회원 정보 DB 저장
-        TokenResponse response = authService.SaveUserAndGetToken(oauthToken.getAccess_token());
+        TokenResponse response = authService.kakaoLogin(code);
 
-        return ResponseEntity.ok(response);
+        return MoaApiResponse.createResponse(response, UserMessage.LOGIN_SUCCESS);
     }
 }
 

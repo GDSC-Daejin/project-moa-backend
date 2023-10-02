@@ -2,7 +2,7 @@ package com.gdsc.moa.global.jwt;
 
 import com.gdsc.moa.global.jwt.dto.TokenResponse;
 import com.gdsc.moa.global.jwt.oauth.UserInfo;
-import com.gdsc.moa.user.entity.RoleType;
+import com.gdsc.moa.domain.user.entity.RoleType;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;

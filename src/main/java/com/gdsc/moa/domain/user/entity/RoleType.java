@@ -1,4 +1,4 @@
-package com.gdsc.moa.user.entity;
+package com.gdsc.moa.domain.user.entity;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

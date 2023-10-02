@@ -1,6 +1,6 @@
 package com.gdsc.moa.api.controller;
 
-import com.gdsc.moa.global.jwt.dto.KakaoUserInfo;
+import com.gdsc.moa.domain.user.info.impl.KakaoOAuth2UserInfo;
 import com.gdsc.moa.global.jwt.dto.KakaoUserResponse;
 import com.gdsc.moa.global.jwt.dto.TokenResponse;
 import com.google.gson.Gson;
@@ -16,12 +16,12 @@ import org.springframework.web.client.RestTemplate;
 @Component
 public class KakaoOAuth2 {
 
-    public KakaoUserInfo getUserInfo(String authorizedCode) {
+    public KakaoOAuth2UserInfo getUserInfo(String authorizedCode) {
         System.out.println("getUserInfo 호출");
         // 인가코드 -> 액세스 토큰
         String accessToken = getAccessToken(authorizedCode);
         // 액세스 토큰 -> 카카오 사용자 정보
-        KakaoUserInfo userInfo = getUserInfoByToken(accessToken);
+        KakaoOAuth2UserInfo userInfo = getUserInfoByToken(accessToken);
 
         return userInfo;
     }
@@ -62,7 +62,7 @@ public class KakaoOAuth2 {
     }
 
     //토큰을 통해 사용자 정보 가져오기
-    private KakaoUserInfo getUserInfoByToken(String accessToken) {
+    private KakaoOAuth2UserInfo getUserInfoByToken(String accessToken) {
         // HttpHeader 오브젝트 생성
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Bearer " + accessToken);
@@ -83,8 +83,8 @@ public class KakaoOAuth2 {
         Gson gson = new Gson();
         KakaoUserResponse kakaoUserResponse = gson.fromJson(response.getBody(), KakaoUserResponse.class);
 
-
         //가져온 사용자 정보를 객체로 만들어서 반환
-        return new KakaoUserInfo(kakaoUserResponse.getKakao_account().getEmail(), kakaoUserResponse.getProperties().getNickname(), kakaoUserResponse.getProperties().getProfile_image());
+        return new KakaoOAuth2UserInfo(kakaoUserResponse);
+//        return new KakaoUserInfo(kakaoUserResponse.getKakao_account().getEmail(), kakaoUserResponse.getProperties().getNickname(), kakaoUserResponse.getProperties().getProfile_image());
     }
 }
