@@ -34,16 +34,11 @@ public class SecurityConfig {
 
     @Bean
     public WebSecurityCustomizer configure() {
-        return (web -> {
-            web.ignoring().requestMatchers(
-                    new AntPathRequestMatcher("/swagger-ui/**"),
-                    new AntPathRequestMatcher("/h2-console/**"),
-                    new AntPathRequestMatcher("/favicon.ico"),
-                    new AntPathRequestMatcher("/v2/api-docs"));
-//                    TODO : h2 지우면 변경해야함
-//                    "/swagger-ui/**", "/v2/api-docs"
-//                    ,"/h2-console/**", "/favicon.ico");
-        });
+        return (web -> web.ignoring().requestMatchers(
+                new AntPathRequestMatcher("/swagger-ui/**"),
+                new AntPathRequestMatcher("/h2-console/**"),
+                new AntPathRequestMatcher("/favicon.ico"),
+                new AntPathRequestMatcher("/v2/api-docs")));
     }
     @Bean
     protected SecurityFilterChain filterChain(HttpSecurity http, HandlerMappingIntrospector introspector) throws Exception {
@@ -61,8 +56,6 @@ public class SecurityConfig {
             //권한 설정
             .authorizeHttpRequests(httpRequest ->
                     httpRequest.requestMatchers(new MvcRequestMatcher(introspector, "/**/user/**")).authenticated()
-                        //TODO : 여기도 h2 지우면 변경해야함
-//                            .requestMatchers(HttpMethod.DELETE, "/**/user").authenticated()
                             .anyRequest().permitAll())
             // JwtFilter 를 addFilterBefore 로 등록했던 JwtSecurityConfig 클래스를 적용
             .apply(new JwtFilterConfig(tokenProvider));

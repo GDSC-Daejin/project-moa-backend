@@ -17,12 +17,12 @@ public class KakaoOAuth2UserInfo extends OAuth2UserInfo {
 
     private final SocialType socialType = SocialType.KAKAO;
 
-    public UserEntity createUserEntity(KakaoUserResponse kakaoProfile) {
+    public UserEntity createUserEntity(KakaoOAuth2UserInfo kakaoProfile) {
         new UserEntity();
         return UserEntity.builder()
-                .email(kakaoProfile.getKakao_account().getEmail())
-                .nickname(kakaoProfile.getKakao_account().getProfile().getNickname())
-                .profileImageUrl(kakaoProfile.getProperties().getProfile_image())
+                .email(kakaoProfile.getEmail())
+                .nickname(kakaoProfile.getNickname())
+                .profileImageUrl(kakaoProfile.getImageUrl())
                 .userRole(RoleType.MEMBER)
                 .socialType(SocialType.KAKAO)
                 .status(Status.ACTIVE)
