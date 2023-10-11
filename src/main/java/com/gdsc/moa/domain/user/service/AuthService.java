@@ -9,6 +9,7 @@ import com.gdsc.moa.global.jwt.TokenProvider;
 import com.gdsc.moa.domain.user.entity.RoleType;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
@@ -27,18 +28,14 @@ public class AuthService {
     private final UserRepository userRepository;
     private final TokenProvider tokenProvider;
 
-    public TokenResponse kakaoLogin(String idToken) {
-        KakaoOAuth2UserInfo profile = getUserInfoByToken(idToken);
-        if (userRepository.existsByEmail(profile.getEmail())) {
-            // 이미 등록된 사용자의 경우 토큰을 생성하고 반환
-            UserEntity user = userRepository.findByEmail(profile.getEmail()).orElse(null);
-            return createToken(user);
-        } else {// 사용자가 존재하지 않는 경우 새로운 사용자 생성
-            UserEntity newUser = profile.createUserEntity();
-            userRepository.save(newUser);
-            // 새로운 사용자에게 토큰을 생성하고 반환
-            return createToken(newUser);
-        }
+    public TokenResponse kakaoLogin(String accessToken) {
+        KakaoOAuth2UserInfo profile = getUserInfoByToken(accessToken);
+
+        UserEntity user = userRepository.findByEmail(profile.getEmail())
+                .orElse(profile.createUserEntity());
+        userRepository.save(user);
+
+        return createToken(user);
     }
 
 

@@ -18,8 +18,8 @@ public class AuthController {
     private final AuthService authService;
 
     @GetMapping("/kakaologin")
-    public MoaApiResponse<TokenResponse> kakaoLogin(String idToken) throws JsonProcessingException {
-        TokenResponse response = authService.kakaoLogin(idToken);
+    public MoaApiResponse<TokenResponse> kakaoLogin(String accessToken) throws JsonProcessingException {
+        TokenResponse response = authService.kakaoLogin(accessToken);
         return MoaApiResponse.createResponse(response, UserMessage.LOGIN_SUCCESS);
     }
 }

@@ -1,5 +1,6 @@
 package com.gdsc.moa.domain.user.entity;
 
+import com.gdsc.moa.global.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -8,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Entity
 @NoArgsConstructor
-public class UserEntity {
+public class UserEntity extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -22,10 +23,6 @@ public class UserEntity {
     private SocialType socialType;
     @Enumerated(EnumType.STRING)
     private Status status;
-
-    public void setId(Long kakaoId) {
-        this.id = kakaoId;
-    }
 
     @Builder
     public UserEntity(String email,
