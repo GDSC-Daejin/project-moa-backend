@@ -3,7 +3,6 @@ package com.gdsc.moa.domain.user.service;
 import com.gdsc.moa.domain.user.entity.UserEntity;
 import com.gdsc.moa.domain.user.info.impl.KakaoOAuth2UserInfo;
 import com.gdsc.moa.domain.user.repository.UserRepository;
-import com.gdsc.moa.global.jwt.dto.KakaoIdTokenDecoder;
 import com.gdsc.moa.global.jwt.dto.KakaoUserResponse;
 import com.gdsc.moa.global.jwt.dto.TokenResponse;
 import com.gdsc.moa.global.jwt.TokenProvider;
@@ -12,7 +11,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -30,17 +28,17 @@ public class AuthService {
     private final TokenProvider tokenProvider;
 
     public TokenResponse kakaoLogin(String idToken) {
-        // 발급 받은 accessToken 으로 카카오 회원 정보 DB 저장
-        return saveUserAndGetToken(idToken);
-    }
-
-public TokenResponse saveUserAndGetToken(String idToken)  {
         KakaoOAuth2UserInfo profile = getUserInfoByToken(idToken);
-
-        UserEntity user = profile.createUserEntity();
-        userRepository.save(user);
-
-        return createToken(user);
+        if (userRepository.existsByEmail(profile.getEmail())) {
+            // 이미 등록된 사용자의 경우 토큰을 생성하고 반환
+            UserEntity user = userRepository.findByEmail(profile.getEmail()).orElse(null);
+            return createToken(user);
+        } else {// 사용자가 존재하지 않는 경우 새로운 사용자 생성
+            UserEntity newUser = profile.createUserEntity();
+            userRepository.save(newUser);
+            // 새로운 사용자에게 토큰을 생성하고 반환
+            return createToken(newUser);
+        }
     }
 
 
@@ -54,13 +52,11 @@ public TokenResponse saveUserAndGetToken(String idToken)  {
         headers.add("Authorization", "Bearer " + accessToken);
         headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
 
-
         // HttpHeader와 HttpBody를 하나의 오브젝트에 담기
         RestTemplate rt = new RestTemplate();
         HttpEntity<MultiValueMap<String, String>> kakaoProfileRequest = new HttpEntity<>(headers);
 
         // Http 요청하기 - Post방식으로 - 그리고 response 변수의 응답 받음.
-
         ResponseEntity<String> kakaoProfileResponse = rt.exchange(
                 "https://kapi.kakao.com/v2/user/me",
                 HttpMethod.POST,
@@ -68,7 +64,6 @@ public TokenResponse saveUserAndGetToken(String idToken)  {
                 String.class
         );
 
-        log.info("Kakao API Response: {}", kakaoProfileResponse);
         ObjectMapper objectMapper = new ObjectMapper();
         KakaoUserResponse kakaoProfile = null;
         try {
@@ -76,8 +71,6 @@ public TokenResponse saveUserAndGetToken(String idToken)  {
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
-        log.info("Kakao API kakaoUserResponse: {}", kakaoProfile);
-
         //가져온 사용자 정보를 객체로 만들어서 반환
         return new KakaoOAuth2UserInfo(kakaoProfile);
     }
