@@ -7,23 +7,17 @@ import com.gdsc.moa.global.jwt.dto.KakaoUserResponse;
 import com.gdsc.moa.global.jwt.dto.TokenResponse;
 import com.gdsc.moa.global.jwt.TokenProvider;
 import com.gdsc.moa.domain.user.entity.RoleType;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.stereotype.Service;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.netty.http.client.HttpClient;
 
+import java.time.Duration;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class AuthService {
     private final UserRepository userRepository;
     private final TokenProvider tokenProvider;
@@ -38,39 +32,24 @@ public class AuthService {
         return createToken(user);
     }
 
-
     private TokenResponse createToken(UserEntity user) {
         return tokenProvider.generateJwtToken(user.getEmail(), user.getNickname(), RoleType.MEMBER);
     }
 
     private KakaoOAuth2UserInfo getUserInfoByToken(String accessToken) {
-        // HttpHeader 오브젝트 생성
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization", "Bearer " + accessToken);
-        headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
+        WebClient webClient = WebClient.builder()
+                .baseUrl("https://kapi.kakao.com")
+                .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, "application/x-www-form-urlencoded;charset=utf-8")
+                .clientConnector(new ReactorClientHttpConnector(HttpClient.newConnection().responseTimeout(Duration.ofSeconds(5))))
+                .build();
 
-        // HttpHeader와 HttpBody를 하나의 오브젝트에 담기
-        RestTemplate rt = new RestTemplate();
-        HttpEntity<MultiValueMap<String, String>> kakaoProfileRequest = new HttpEntity<>(headers);
+        KakaoUserResponse kakaoProfile = webClient.post()
+                .uri("/v2/user/me")
+                .retrieve()
+                .bodyToMono(KakaoUserResponse.class)
+                .block();
 
-        // Http 요청하기 - Post방식으로 - 그리고 response 변수의 응답 받음.
-        ResponseEntity<String> kakaoProfileResponse = rt.exchange(
-                "https://kapi.kakao.com/v2/user/me",
-                HttpMethod.POST,
-                kakaoProfileRequest,
-                String.class
-        );
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        KakaoUserResponse kakaoProfile = null;
-        try {
-            kakaoProfile = objectMapper.readValue(kakaoProfileResponse.getBody(), KakaoUserResponse.class);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
-        //가져온 사용자 정보를 객체로 만들어서 반환
         return new KakaoOAuth2UserInfo(kakaoProfile);
     }
-
 }
-
