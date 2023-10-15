@@ -26,9 +26,30 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-web'
 
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.mariadb.jdbc:mariadb-java-client:3.1.2'
     runtimeOnly 'org.mariadb.jdbc:mariadb-java-client' // MariaDB
+
+    implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+
+    implementation 'com.google.code.gson:gson:2.10.1'
+
+    compileOnly 'io.jsonwebtoken:jjwt-api:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+    implementation 'com.auth0:java-jwt:4.3.0'
+
+
+    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    implementation 'com.h2database:h2'
+
+    //스웨거
+    implementation("org.springdoc:springdoc-openapi-starter-common:2.1.0")
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.4'
+
 
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
