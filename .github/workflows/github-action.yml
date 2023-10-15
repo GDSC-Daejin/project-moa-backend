@@ -1,0 +1,57 @@
+name: Java CI with Gradle
+on:
+  push:
+    branches: [ "feature/configSetting", "develop"]
+permissions:
+  contents: read
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+
+    ## create application-dev.properties
+    - name: make application-dev.properties
+      if: contains(github.ref, 'develop')
+      run: |
+          cd ./src/main/resources
+          touch ./application-dev.yml
+          echo "${{ secrets.PROPERTIES_DEV }}" > ./application-dev.yml
+      shell: bash
+
+    ## gradle build
+    - name: Build with Gradle
+      run: ./gradlew clean build
+    
+    ## docker build & push to develop
+    - name: Docker build & push to dev
+      if: contains(github.ref, 'develop')
+      run: |
+          docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }}:app .
+          docker push ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }}:app  ## docker compose up
+    - name: executing remote ssh commands using password
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.HOSTNAME }}
+        key: ${{ secrets.KEY }}
+        port: 50022
+        script: |
+          cd /home/jsangmin/moa
+          docker-compose down --rmi local
+          docker pull ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }}:app
+          docker-compose up -d
+          docker image prune -f
+      continue-on-error: true
