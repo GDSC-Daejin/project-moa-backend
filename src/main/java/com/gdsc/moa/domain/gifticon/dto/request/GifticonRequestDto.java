@@ -10,10 +10,10 @@ import java.util.Date;
 @Getter
 public class GifticonRequestDto {
     private String name;
-    private String barcode_number;
-    private String gifticon_image_url;
-    private String exchange_place;
-    private Date due_date;
-    private String order_number;
-    private GifticonType gifticon_type;
+    private String barcodeNumber;
+    private String gifticonImagePath;
+    private String exchangePlace;
+    private Date dueDate;
+    private String orderNumber;
+    private GifticonType gifticonType;
 }

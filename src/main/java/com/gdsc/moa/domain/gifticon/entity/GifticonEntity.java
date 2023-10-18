@@ -1,8 +1,6 @@
 package com.gdsc.moa.domain.gifticon.entity;
 
 import com.gdsc.moa.domain.user.entity.UserEntity;
-import io.swagger.v3.core.converter.AnnotatedType;
-import io.swagger.v3.core.util.Json;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,41 +17,42 @@ public class GifticonEntity {
     @GeneratedValue(generator = "gifticon_seq")
     private Long id;
     private String name;
-    private String barcode_number;
-    private String gifticon_image_url;
-    private String exchange_place;
-    private Date due_date;
-    private String order_number;
+    private String barcodeNumber;
+    private String gifticonImagePath;
+    private String exchangePlace;
+    private Date dueDate;
+    private String orderNumber;
     @Enumerated(EnumType.STRING)
-    private GifticonType gifticon_type;
+    private GifticonType gifticonType;
     @Enumerated(EnumType.STRING)
     private Status status;
-    private Date used_date;
+    private Date usedDate;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    private UserEntity user_id;
+    private UserEntity user;
 
     @Builder
     public GifticonEntity(String name,
-                          String barcode_number,
-                          String gifticon_image_url,
-                          String exchange_place,
-                          Date due_date,
-                          String order_number,
-                          GifticonType gifticon_type,
+                          String barcodeNumber,
+                          String gifticonImagePath,
+                          String exchangePlace,
+                          Date dueDate,
+                          String orderNumber,
+                          GifticonType gifticonType,
                           Status status,
-                          Date used_date,
-                          UserEntity user_id) {
+                          Date usedDate,
+                          UserEntity user) {
         this.name = name;
-        this.barcode_number = barcode_number;
-        this.gifticon_image_url = gifticon_image_url;
-        this.exchange_place = exchange_place;
-        this.due_date = due_date;
-        this.order_number = order_number;
-        this.gifticon_type = gifticon_type;
+        this.barcodeNumber = barcodeNumber;
+        this.gifticonImagePath = gifticonImagePath;
+        this.exchangePlace = exchangePlace;
+        this.dueDate = dueDate;
+        this.orderNumber = orderNumber;
+        this.gifticonType = gifticonType;
         this.status = status;
-        this.used_date = used_date;
-        this.user_id = user_id;
+        this.usedDate = usedDate;
+        this.user = user;
+
     }
 
 

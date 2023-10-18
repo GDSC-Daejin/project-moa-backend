@@ -12,27 +12,27 @@ import java.util.Date;
 @Builder
 public class GifticonResponseDto {
     private String name;
-    private String barcode_number;
-    private String gifticon_image_url;
-    private String exchange_place;
-    private Date due_date;
-    private GifticonType gifticon_type;
-    private String order_number;
+    private String barcodeNumber;
+    private String gifticonImagePath;
+    private String exchangePlace;
+    private Date dueDate;
+    private GifticonType gifticonType;
+    private String orderNumber;
     private Status status;
-    private Date used_date;
+    private Date usedDate;
     private String author;
 
     public GifticonResponseDto(GifticonEntity savedGifticon) {
         this.name = savedGifticon.getName();
-        this.barcode_number = savedGifticon.getBarcode_number();
-        this.gifticon_image_url = savedGifticon.getGifticon_image_url();
-        this.exchange_place = savedGifticon.getExchange_place();
-        this.due_date = savedGifticon.getDue_date();
-        this.gifticon_type = savedGifticon.getGifticon_type();
-        this.order_number = savedGifticon.getOrder_number();
+        this.barcodeNumber = savedGifticon.getBarcodeNumber();
+        this.gifticonImagePath = savedGifticon.getGifticonImagePath();
+        this.exchangePlace = savedGifticon.getExchangePlace();
+        this.dueDate = savedGifticon.getDueDate();
+        this.gifticonType = savedGifticon.getGifticonType();
+        this.orderNumber = savedGifticon.getOrderNumber();
         this.status = savedGifticon.getStatus();
-        this.used_date = savedGifticon.getUsed_date();
-        this.author = savedGifticon.getUser_id().getNickname();
+        this.usedDate = savedGifticon.getUsedDate();
+        this.author = savedGifticon.getUser().getNickname();
 
     }
 }
