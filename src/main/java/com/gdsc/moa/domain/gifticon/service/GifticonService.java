@@ -1,9 +1,9 @@
 package com.gdsc.moa.domain.gifticon.service;
 
 import com.gdsc.moa.domain.gifticon.dto.request.GifticonRequestDto;
+import com.gdsc.moa.domain.gifticon.dto.request.GifticonUpdateRequestDto;
 import com.gdsc.moa.domain.gifticon.dto.response.GifticonResponseDto;
 import com.gdsc.moa.domain.gifticon.entity.GifticonEntity;
-import com.gdsc.moa.domain.gifticon.entity.Status;
 import com.gdsc.moa.domain.gifticon.repository.GifticonRepository;
 import com.gdsc.moa.domain.user.entity.UserEntity;
 import com.gdsc.moa.domain.user.repository.UserRepository;
@@ -39,13 +39,13 @@ public class GifticonService {
         return new GifticonResponseDto(gifticonEntity);
     }
 
-    public GifticonResponseDto updateGifticon(Long gifticonId, GifticonRequestDto gifticonRequestDto, String email) {
+    public GifticonResponseDto updateGifticon(GifticonUpdateRequestDto gifticonUpdateRequestDto, String email) {
         UserEntity user = findUser(email);
-        GifticonEntity gifticonEntity = findGifticon(gifticonId);
+        GifticonEntity gifticonEntity = findGifticon(gifticonUpdateRequestDto.getId());
         if (!gifticonEntity.getUser().equals(user))
             throw new ApiException(GifticonMessage.GIFTICON_NOT_BELONG_TO_USER);
 
-        GifticonEntity updatedGifticon = new GifticonEntity(gifticonRequestDto, user);
+        GifticonEntity updatedGifticon = new GifticonEntity(gifticonUpdateRequestDto, user);
 
         updatedGifticon = gifticonRepository.save(updatedGifticon);
 

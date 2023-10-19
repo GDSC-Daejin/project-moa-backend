@@ -1,7 +1,7 @@
 package com.gdsc.moa.domain.gifticon.entity;
 
 import com.gdsc.moa.domain.gifticon.dto.request.GifticonRequestDto;
-import com.gdsc.moa.domain.gifticon.dto.response.GifticonResponseDto;
+import com.gdsc.moa.domain.gifticon.dto.request.GifticonUpdateRequestDto;
 import com.gdsc.moa.domain.user.entity.UserEntity;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -68,6 +68,20 @@ public class GifticonEntity {
         this.status = Status.AVAILABLE;
         this.usedDate = null;
         this.user = user;
+    }
+    @Builder
+    public GifticonEntity(GifticonUpdateRequestDto gifticonUpdateRequestDto, UserEntity user){
+        this.id = gifticonUpdateRequestDto.getId();
+        this.barcodeNumber = gifticonUpdateRequestDto.getBarcodeNumber();
+        this.gifticonImagePath = gifticonUpdateRequestDto.getGifticonImagePath();
+        this.exchangePlace = gifticonUpdateRequestDto.getExchangePlace();
+        this.dueDate = gifticonUpdateRequestDto.getDueDate();
+        this.orderNumber = gifticonUpdateRequestDto.getOrderNumber();
+        this.gifticonType = gifticonUpdateRequestDto.getGifticonType();
+        this.status = Status.AVAILABLE;
+        this.usedDate = null;
+        this.user = user;
+
     }
 
     //TODO: 10/15/23  사용한 유저 map 으로 json형식으로 만들기

@@ -1,6 +1,7 @@
 package com.gdsc.moa.domain.gifticon.controller;
 
 import com.gdsc.moa.domain.gifticon.dto.request.GifticonRequestDto;
+import com.gdsc.moa.domain.gifticon.dto.request.GifticonUpdateRequestDto;
 import com.gdsc.moa.domain.gifticon.dto.response.GifticonResponseDto;
 import com.gdsc.moa.domain.gifticon.service.GifticonService;
 import com.gdsc.moa.global.dto.MoaApiResponse;
@@ -9,11 +10,7 @@ import com.gdsc.moa.global.message.GifticonMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -35,9 +32,9 @@ public class GifticonController {
         return MoaApiResponse.createResponse(response, GifticonMessage.GIFTICON_CREATE_SUCCESS);
     }
 
-    @PutMapping("/{gifticonId}")
-    public MoaApiResponse<GifticonResponseDto> updateGifticon(@PathVariable Long gifticonId, @RequestBody GifticonRequestDto gifticonRequestDto, @AuthenticationPrincipal UserInfo user) {
-        GifticonResponseDto response = gifticonService.updateGifticon(gifticonId, gifticonRequestDto, user.getEmail());
+    @PutMapping("/")
+    public MoaApiResponse<GifticonResponseDto> updateGifticon(@RequestBody GifticonUpdateRequestDto gifticonUpdateRequestDto, @AuthenticationPrincipal UserInfo user) {
+        GifticonResponseDto response = gifticonService.updateGifticon(gifticonUpdateRequestDto, user.getEmail());
         return MoaApiResponse.createResponse(response, GifticonMessage.GIFTICON_UPDATE_SUCCESS);
     }
 
