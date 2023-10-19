@@ -19,7 +19,7 @@ public class GifticonController {
     private final GifticonService gifticonService;
 
 
-    @PostMapping("/")
+    @PostMapping("")
     public MoaApiResponse<GifticonResponseDto> createGifticon(@RequestBody GifticonRequestDto gifticonRequestDto, @AuthenticationPrincipal UserInfo user){
 
         GifticonResponseDto response = gifticonService.createGifticon(gifticonRequestDto, user.getEmail());
@@ -32,7 +32,7 @@ public class GifticonController {
         return MoaApiResponse.createResponse(response, GifticonMessage.GIFTICON_CREATE_SUCCESS);
     }
 
-    @PutMapping("/")
+    @PutMapping("")
     public MoaApiResponse<GifticonResponseDto> updateGifticon(@RequestBody GifticonUpdateRequestDto gifticonUpdateRequestDto, @AuthenticationPrincipal UserInfo user) {
         GifticonResponseDto response = gifticonService.updateGifticon(gifticonUpdateRequestDto, user.getEmail());
         return MoaApiResponse.createResponse(response, GifticonMessage.GIFTICON_UPDATE_SUCCESS);
