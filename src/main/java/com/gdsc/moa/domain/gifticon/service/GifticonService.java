@@ -22,69 +22,44 @@ public class GifticonService {
     //Gifticon 생성
     public GifticonResponseDto createGifticon(GifticonRequestDto gifticonRequestDto, String email) {
         UserEntity user = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("해당 유저가 없습니다. email=" + email));
-        GifticonEntity gifticonEntity = GifticonEntity.builder()
-                .name(gifticonRequestDto.getName())
-                .barcodeNumber(gifticonRequestDto.getBarcodeNumber())
-                .gifticonImagePath(gifticonRequestDto.getGifticonImagePath())
-                .exchangePlace(gifticonRequestDto.getExchangePlace())
-                .dueDate(gifticonRequestDto.getDueDate())
-                .gifticonType(gifticonRequestDto.getGifticonType())
-                .orderNumber(gifticonRequestDto.getOrderNumber())
-                .status(Status.AVAILABLE)
-                .usedDate(null)
-                .user(user)
-                .build();
+        GifticonEntity gifticonEntity = new GifticonEntity(gifticonRequestDto,user);
         GifticonEntity savedGifticon = gifticonRepository.save(gifticonEntity);
 
         return new GifticonResponseDto(savedGifticon);
     }
 
-    public GifticonResponseDto deleteGifticon(Long gifticonId , String email) {
-        GifticonEntity gifticonEntity = checkUserAndGifticon(gifticonId, email);
-
+    public void deleteGifticon(Long gifticonId, String email) {
+        GifticonEntity gifticonEntity = finduserandgifticon(gifticonId, email);
         gifticonRepository.delete(gifticonEntity);
-
-        return null;
     }
 
     public GifticonResponseDto getGifticonDetail(Long gifticonId, String email) {
-        GifticonEntity gifticonEntity = checkUserAndGifticon(gifticonId, email);
+        GifticonEntity gifticonEntity = finduserandgifticon(gifticonId, email);
 
         return new GifticonResponseDto(gifticonEntity);
     }
 
     public GifticonResponseDto updateGifticon(Long gifticonId, GifticonRequestDto gifticonRequestDto, String email) {
-        UserEntity user = checkUser(email);
-        GifticonEntity gifticonEntity = checkGifticon(gifticonId);
+        UserEntity user = findUser(email);
+        GifticonEntity gifticonEntity = findGifticon(gifticonId);
         if (!gifticonEntity.getUser().equals(user))
             throw new ApiException(GifticonMessage.GIFTICON_NOT_BELONG_TO_USER);
 
-        GifticonEntity updatedGifticon = GifticonEntity.builder()
-                .name(gifticonRequestDto.getName())
-                .barcodeNumber(gifticonRequestDto.getBarcodeNumber())
-                .gifticonImagePath(gifticonRequestDto.getGifticonImagePath())
-                .exchangePlace(gifticonRequestDto.getExchangePlace())
-                .dueDate(gifticonRequestDto.getDueDate())
-                .gifticonType(gifticonRequestDto.getGifticonType())
-                .orderNumber(gifticonRequestDto.getOrderNumber())
-                .status(gifticonEntity.getStatus())
-                .usedDate(gifticonEntity.getUsedDate())
-                .user(user)
-                .build();
+        GifticonEntity updatedGifticon = new GifticonEntity(gifticonRequestDto, user);
 
         updatedGifticon = gifticonRepository.save(updatedGifticon);
 
         return new GifticonResponseDto(updatedGifticon);
     }
 
-    private GifticonEntity checkUserAndGifticon(Long gifticonId, String email) {
+    private GifticonEntity finduserandgifticon(Long gifticonId, String email) {
         UserEntity user = userRepository.findByEmail(email).orElseThrow(() -> new ApiException(UserMessage.USER_NOT_FOUND));
         return gifticonRepository.findById(gifticonId).orElseThrow(() -> new ApiException(GifticonMessage.GIFTICON_NOT_FOUND) );
     }
-    private GifticonEntity checkGifticon(Long gifticonId) {
+    private GifticonEntity findGifticon(Long gifticonId) {
         return gifticonRepository.findById(gifticonId).orElseThrow(() -> new ApiException(GifticonMessage.GIFTICON_NOT_FOUND) );
     }
-    private UserEntity checkUser(String email) {
+    private UserEntity findUser(String email) {
         return userRepository.findByEmail(email).orElseThrow(() -> new ApiException(UserMessage.USER_NOT_FOUND));
     }
 }

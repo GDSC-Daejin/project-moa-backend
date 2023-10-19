@@ -17,30 +17,31 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/api/v1/gifticon")
 public class GifticonController {
     private final GifticonService gifticonService;
 
 
-    @PostMapping("/gifticon")
+    @PostMapping("/")
     public MoaApiResponse<GifticonResponseDto> createGifticon(@RequestBody GifticonRequestDto gifticonRequestDto, @AuthenticationPrincipal UserInfo user){
 
         GifticonResponseDto response = gifticonService.createGifticon(gifticonRequestDto, user.getEmail());
         return MoaApiResponse.createResponse(response, GifticonMessage.GIFTICON_CREATE_SUCCESS);
     }
 
-    @GetMapping("/gifticon/{gifticonId}")
+    @GetMapping("/{gifticonId}")
     public MoaApiResponse<GifticonResponseDto> getGifticon(@PathVariable Long gifticonId, @AuthenticationPrincipal UserInfo user) {
         GifticonResponseDto response = gifticonService.getGifticonDetail(gifticonId, user.getEmail());
         return MoaApiResponse.createResponse(response, GifticonMessage.GIFTICON_CREATE_SUCCESS);
     }
 
-    @PutMapping("/gifticon/{gifticonId}")
+    @PutMapping("/{gifticonId}")
     public MoaApiResponse<GifticonResponseDto> updateGifticon(@PathVariable Long gifticonId, @RequestBody GifticonRequestDto gifticonRequestDto, @AuthenticationPrincipal UserInfo user) {
         GifticonResponseDto response = gifticonService.updateGifticon(gifticonId, gifticonRequestDto, user.getEmail());
         return MoaApiResponse.createResponse(response, GifticonMessage.GIFTICON_UPDATE_SUCCESS);
     }
 
-    @DeleteMapping("/gifticon/{gifticonId}")
+    @DeleteMapping("/{gifticonId}")
 
     public MoaApiResponse<GifticonResponseDto> deleteGifticon(@PathVariable Long gifticonId, @AuthenticationPrincipal UserInfo user) {
         gifticonService.deleteGifticon(gifticonId, user.getEmail());
