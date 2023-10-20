@@ -72,6 +72,7 @@ public class GifticonEntity {
     @Builder
     public GifticonEntity(GifticonUpdateRequestDto gifticonUpdateRequestDto, UserEntity user){
         this.id = gifticonUpdateRequestDto.getId();
+        this.name = gifticonUpdateRequestDto.getName();
         this.barcodeNumber = gifticonUpdateRequestDto.getBarcodeNumber();
         this.gifticonImagePath = gifticonUpdateRequestDto.getGifticonImagePath();
         this.exchangePlace = gifticonUpdateRequestDto.getExchangePlace();
