@@ -1,7 +1,5 @@
 package com.gdsc.moa.domain.gifticon.dto.response;
 
-import com.gdsc.moa.domain.category.dto.CategoryResponseDto;
-import com.gdsc.moa.domain.category.entity.CategoryEntity;
 import com.gdsc.moa.domain.gifticon.entity.GifticonEntity;
 import com.gdsc.moa.domain.gifticon.entity.GifticonType;
 import com.gdsc.moa.domain.gifticon.entity.Status;
@@ -26,7 +24,6 @@ public class GifticonResponseDto {
     private Status status;
     private Date usedDate;
     private AuthorDto author;
-    private CategoryResponseDto category;
 
     public GifticonResponseDto(GifticonEntity savedGifticon) {
         this.id = savedGifticon.getId();
@@ -43,9 +40,6 @@ public class GifticonResponseDto {
                 savedGifticon.getUser().getId(),
                 savedGifticon.getUser().getNickname(),
                 savedGifticon.getUser().getProfileImageUrl());
-        this.category = new CategoryResponseDto(
-                savedGifticon.getCategory().getId(),
-                savedGifticon.getCategory().getCategoryName());
     }
 
 }

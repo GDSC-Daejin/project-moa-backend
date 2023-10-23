@@ -15,5 +15,4 @@ public class GifticonRequestDto {
     private Date dueDate;
     private String orderNumber;
     private GifticonType gifticonType;
-    private Long categoryId;
 }

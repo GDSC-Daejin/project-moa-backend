@@ -1,6 +1,5 @@
 package com.gdsc.moa.domain.gifticon.entity;
 
-import com.gdsc.moa.domain.category.entity.CategoryEntity;
 import com.gdsc.moa.domain.gifticon.dto.request.GifticonRequestDto;
 import com.gdsc.moa.domain.gifticon.dto.request.GifticonUpdateRequestDto;
 import com.gdsc.moa.domain.user.entity.UserEntity;
@@ -17,8 +16,7 @@ import java.util.Date;
 @Table(name = "tb_gifticon")
 public class GifticonEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "gifticon_id")
+    @GeneratedValue(generator = "gifticon_seq")
     private Long id;
     private String name;
     private String barcodeNumber;
@@ -34,9 +32,6 @@ public class GifticonEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private UserEntity user;
-    @ManyToOne
-    @JoinColumn(name = "category_id")
-    private CategoryEntity category;
 
     @Builder
     public GifticonEntity(String name,
@@ -62,7 +57,7 @@ public class GifticonEntity {
 
     }
     @Builder
-    public GifticonEntity(GifticonRequestDto gifticonRequestDto, UserEntity user, CategoryEntity category){
+    public GifticonEntity(GifticonRequestDto gifticonRequestDto, UserEntity user) {
         this.name = gifticonRequestDto.getName();
         this.barcodeNumber = gifticonRequestDto.getBarcodeNumber();
         this.gifticonImagePath = gifticonRequestDto.getGifticonImagePath();
@@ -73,10 +68,9 @@ public class GifticonEntity {
         this.status = Status.AVAILABLE;
         this.usedDate = null;
         this.user = user;
-        this.category = category;
     }
     @Builder
-    public GifticonEntity(GifticonUpdateRequestDto gifticonUpdateRequestDto, UserEntity user,CategoryEntity category){
+    public GifticonEntity(GifticonUpdateRequestDto gifticonUpdateRequestDto, UserEntity user){
         this.id = gifticonUpdateRequestDto.getId();
         this.name = gifticonUpdateRequestDto.getName();
         this.barcodeNumber = gifticonUpdateRequestDto.getBarcodeNumber();
@@ -88,7 +82,6 @@ public class GifticonEntity {
         this.status = Status.AVAILABLE;
         this.usedDate = null;
         this.user = user;
-        this.category = category;
 
     }
 
