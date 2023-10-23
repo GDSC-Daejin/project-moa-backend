@@ -1,23 +1,37 @@
 package com.gdsc.moa.domain.gifticon.service;
 
+import com.gdsc.moa.domain.category.dto.CategoryResponseDto;
 import com.gdsc.moa.domain.category.entity.CategoryEntity;
 import com.gdsc.moa.domain.category.repository.CategoryRepository;
 import com.gdsc.moa.domain.gifticon.dto.request.GifticonRequestDto;
 import com.gdsc.moa.domain.gifticon.dto.request.GifticonUpdateRequestDto;
 import com.gdsc.moa.domain.gifticon.dto.response.GifticonResponseDto;
+import com.gdsc.moa.domain.gifticon.dto.response.GifticonUsableResponse;
 import com.gdsc.moa.domain.gifticon.entity.GifticonEntity;
+import com.gdsc.moa.domain.gifticon.entity.Status;
 import com.gdsc.moa.domain.gifticon.repository.GifticonRepository;
+import com.gdsc.moa.domain.user.dto.AuthorDto;
 import com.gdsc.moa.domain.user.entity.UserEntity;
 import com.gdsc.moa.domain.user.repository.UserRepository;
 import com.gdsc.moa.global.exception.ApiException;
 import com.gdsc.moa.global.message.GifticonMessage;
 import com.gdsc.moa.global.message.UserMessage;
+import com.gdsc.moa.global.paging.PagingResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class GifticonService {
     private final UserRepository userRepository;
     private final GifticonRepository gifticonRepository;
@@ -59,6 +73,25 @@ public class GifticonService {
         return new GifticonResponseDto(updatedGifticon);
     }
 
+    @Transactional
+    public PagingResponse<GifticonUsableResponse> getUsableGifticon(Pageable pageable, String email) {
+        UserEntity user = findUser(email);
+        Page<GifticonEntity> gifticonEntities = gifticonRepository.findByUserAndStatus(user, Status.AVAILABLE, pageable);
+
+        List<GifticonUsableResponse> usableGifticons =new ArrayList<>();
+
+        for (GifticonEntity gifticonEntity : gifticonEntities) {
+            log.info("gifticonEntity = {}", gifticonEntity.getId());
+            GifticonUsableResponse response = new GifticonUsableResponse(gifticonEntity);
+            usableGifticons.add(response);
+        }
+
+        Page<GifticonUsableResponse> responsePage = new PageImpl<>(usableGifticons, gifticonEntities.getPageable(), gifticonEntities.getTotalElements());
+        return new PagingResponse<>(responsePage);
+    }
+
+
+
     private GifticonEntity finduserandgifticon(Long gifticonId, String email) {
         UserEntity user = userRepository.findByEmail(email).orElseThrow(() -> new ApiException(UserMessage.USER_NOT_FOUND));
         return gifticonRepository.findById(gifticonId).orElseThrow(() -> new ApiException(GifticonMessage.GIFTICON_NOT_FOUND) );
@@ -66,6 +99,7 @@ public class GifticonService {
     private GifticonEntity findGifticon(Long gifticonId) {
         return gifticonRepository.findById(gifticonId).orElseThrow(() -> new ApiException(GifticonMessage.GIFTICON_NOT_FOUND) );
     }
+
     private UserEntity findUser(String email) {
         return userRepository.findByEmail(email).orElseThrow(() -> new ApiException(UserMessage.USER_NOT_FOUND));
     }
