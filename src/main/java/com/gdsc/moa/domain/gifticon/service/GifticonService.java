@@ -1,5 +1,7 @@
 package com.gdsc.moa.domain.gifticon.service;
 
+import com.gdsc.moa.domain.category.entity.CategoryEntity;
+import com.gdsc.moa.domain.category.repository.CategoryRepository;
 import com.gdsc.moa.domain.gifticon.dto.request.GifticonRequestDto;
 import com.gdsc.moa.domain.gifticon.dto.request.GifticonUpdateRequestDto;
 import com.gdsc.moa.domain.gifticon.dto.response.GifticonResponseDto;
@@ -19,12 +21,14 @@ import org.springframework.transaction.annotation.Transactional;
 public class GifticonService {
     private final UserRepository userRepository;
     private final GifticonRepository gifticonRepository;
+    private final CategoryRepository categoryRepository;
 
     //Gifticon 생성
     @Transactional
     public GifticonResponseDto createGifticon(GifticonRequestDto gifticonRequestDto, String email) {
         UserEntity user = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("해당 유저가 없습니다. email=" + email));
-        GifticonEntity gifticonEntity = new GifticonEntity(gifticonRequestDto,user);
+        CategoryEntity category = findCategory(gifticonRequestDto.getCategoryId());
+        GifticonEntity gifticonEntity = new GifticonEntity(gifticonRequestDto,user,category);
         GifticonEntity savedGifticon = gifticonRepository.save(gifticonEntity);
 
         return new GifticonResponseDto(savedGifticon);
@@ -43,11 +47,12 @@ public class GifticonService {
     @Transactional
     public GifticonResponseDto updateGifticon(GifticonUpdateRequestDto gifticonUpdateRequestDto, String email) {
         UserEntity user = findUser(email);
+        CategoryEntity category = findCategory(gifticonUpdateRequestDto.getCategoryId());
         GifticonEntity gifticonEntity = findGifticon(gifticonUpdateRequestDto.getId());
         if (!gifticonEntity.getUser().equals(user))
             throw new ApiException(GifticonMessage.GIFTICON_NOT_BELONG_TO_USER);
 
-        GifticonEntity updatedGifticon = new GifticonEntity(gifticonUpdateRequestDto, user);
+        GifticonEntity updatedGifticon = new GifticonEntity(gifticonUpdateRequestDto, user,category);
 
         updatedGifticon = gifticonRepository.save(updatedGifticon);
 
@@ -63,5 +68,8 @@ public class GifticonService {
     }
     private UserEntity findUser(String email) {
         return userRepository.findByEmail(email).orElseThrow(() -> new ApiException(UserMessage.USER_NOT_FOUND));
+    }
+    private CategoryEntity findCategory(Long categoryId) {
+        return categoryRepository.findById(categoryId).orElseThrow(() -> new ApiException(GifticonMessage.CATEGORY_NOT_FOUND));
     }
 }
