@@ -11,7 +11,7 @@ import lombok.Getter;
 import java.util.Date;
 
 @Getter
-public class GifticonUsableResponse {
+public class GifticonListResponse {
     private Long id;
     private String name;
     private String gifticonImagePath;
@@ -25,7 +25,7 @@ public class GifticonUsableResponse {
 
 
     @Builder
-    public GifticonUsableResponse (GifticonEntity gifticonEntity){
+    public GifticonListResponse(GifticonEntity gifticonEntity){
         this.id = gifticonEntity.getId();
         this.name = gifticonEntity.getName();
         this.gifticonImagePath = gifticonEntity.getGifticonImagePath();
