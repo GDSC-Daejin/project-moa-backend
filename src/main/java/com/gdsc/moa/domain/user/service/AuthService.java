@@ -1,16 +1,20 @@
 package com.gdsc.moa.domain.user.service;
 
+import com.gdsc.moa.domain.user.dto.LogoutRequest;
 import com.gdsc.moa.domain.user.entity.RefreshTokenEntity;
 import com.gdsc.moa.domain.user.entity.UserEntity;
 import com.gdsc.moa.domain.user.info.impl.KakaoOAuth2UserInfo;
 import com.gdsc.moa.domain.user.repository.RefreshTokenRepository;
 import com.gdsc.moa.domain.user.repository.UserRepository;
+import com.gdsc.moa.global.exception.ApiException;
 import com.gdsc.moa.global.jwt.dto.KakaoUserResponse;
 import com.gdsc.moa.global.jwt.dto.TokenResponse;
 import com.gdsc.moa.global.jwt.TokenProvider;
 import com.gdsc.moa.domain.user.entity.RoleType;
+import com.gdsc.moa.global.message.UserMessage;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.apache.catalina.User;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.stereotype.Service;
@@ -36,6 +40,10 @@ public class AuthService {
         return createToken(user);
     }
 
+    private UserEntity findUserByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElse(null);
+    }
     private TokenResponse createToken(UserEntity user) {
         TokenResponse tokenResponse = tokenProvider.generateJwtToken(user.getEmail(), user.getNickname(), RoleType.MEMBER);
         RefreshTokenEntity refreshTokenEntity = checkExistingRefreshToken(user.getId());
@@ -74,5 +82,21 @@ public class AuthService {
                 .block();
 
         return new KakaoOAuth2UserInfo(kakaoProfile);
+    }
+
+    public TokenResponse reissue(String email, LogoutRequest logoutRequest) {
+        UserEntity user = findUserByEmail(email);
+        if(user == null) {
+            throw new ApiException(UserMessage.USER_NOT_FOUND);
+        }
+
+        validateRefreshToken(logoutRequest.refreshToken());
+
+        return createToken(user);
+    }
+
+    private void validateRefreshToken(String refreshToken) {
+        if(!tokenProvider.validateToken(refreshToken))
+            throw new ApiException(UserMessage.REFRESH_TOKEN_INVALID);
     }
 }
