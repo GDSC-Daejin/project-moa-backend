@@ -21,6 +21,14 @@ public class AuthController {
         TokenResponse response = authService.kakaoLogin(accessToken);
         return MoaApiResponse.createResponse(response, UserMessage.LOGIN_SUCCESS);
     }
+    //토큰 재발급
+
+    //로그아웃
+
+    //회원 탈퇴
+
+    //닉네임 변경
+
 }
 
 
