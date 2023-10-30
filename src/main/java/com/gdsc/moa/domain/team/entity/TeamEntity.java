@@ -1,6 +1,6 @@
 package com.gdsc.moa.domain.team.entity;
 
-import com.gdsc.moa.domain.team.dto.TeamCreateRequestDto;
+import com.gdsc.moa.domain.team.dto.request.TeamCreateRequestDto;
 import com.gdsc.moa.domain.user.entity.UserEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -10,8 +10,10 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class TeamEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "team_id")
     private Long id;
     private String teamCode;
     private String teamName;

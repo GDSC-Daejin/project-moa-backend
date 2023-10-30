@@ -1,4 +1,4 @@
-package com.gdsc.moa.domain.team.dto;
+package com.gdsc.moa.domain.team.dto.response;
 
 import com.gdsc.moa.domain.team.entity.Status;
 import com.gdsc.moa.domain.team.entity.TeamEntity;

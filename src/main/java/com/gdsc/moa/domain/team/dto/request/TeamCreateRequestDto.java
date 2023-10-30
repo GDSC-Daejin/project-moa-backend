@@ -1,4 +1,4 @@
-package com.gdsc.moa.domain.team.dto;
+package com.gdsc.moa.domain.team.dto.request;
 
 import lombok.Getter;
 

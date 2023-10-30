@@ -21,7 +21,9 @@ public class TeamUserEntity {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private UserEntity userEntity;
-    @ManyToOne
-    @JoinColumn(name = "gifticon_id")
-    private GifticonEntity gifticonEntity;
+
+    public TeamUserEntity(TeamEntity team, UserEntity user) {
+        this.teamEntity = team;
+        this.userEntity = user;
+    }
 }
