@@ -20,10 +20,15 @@ public class TeamEntity {
     @Enumerated(EnumType.STRING)
     private Status status;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private UserEntity user;
+
 
     public TeamEntity(TeamCreateRequestDto teamCreateRequestDto, UserEntity user, String inviteCode) {
         this.teamName = teamCreateRequestDto.getTeamName();
         this.teamCode = inviteCode;
         this.status = Status.AVAILABLE;
+        this.user = user;
     }
 }

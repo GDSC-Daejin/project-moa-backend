@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 
 @Service
@@ -82,6 +83,18 @@ public class TeamService {
 
         return responses;
     }
+
+    @Transactional
+    public void leaveTeam(Long teamId, String email) {
+        UserEntity user = findUser(email);
+        TeamEntity teamEntity = findTeamByTeamCode(teamId.toString());
+        TeamUserEntity teamUserEntity = teamUserRepository.findByTeamEntityAndUserEntity(teamEntity, user).orElseThrow(() -> new ApiException(TeamMessage.TEAM_NOT_FOUND));
+        //방장일 경우
+        if(Objects.equals(teamEntity.getUser().getEmail(), email))
+            teamRepository.delete(teamEntity);
+        teamUserRepository.delete(teamUserEntity);
+    }
+
 
     // 랜덤 초대 코드 생성 메서드
     private String generateInviteCode() {
