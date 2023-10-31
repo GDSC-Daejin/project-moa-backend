@@ -5,9 +5,11 @@ import com.gdsc.moa.domain.team.entity.TeamEntity;
 import com.gdsc.moa.domain.user.entity.UserEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 public class TeamUserEntity {

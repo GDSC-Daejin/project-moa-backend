@@ -1,6 +1,7 @@
 package com.gdsc.moa.domain.team.service;
 
 import com.gdsc.moa.domain.team.dto.request.TeamJoinRequestDto;
+import com.gdsc.moa.domain.team.dto.response.TeamListResponseDto;
 import com.gdsc.moa.domain.team.entity.TeamUserEntity;
 import com.gdsc.moa.domain.team.repository.TeamRepository;
 import com.gdsc.moa.domain.team.dto.request.TeamCreateRequestDto;
@@ -16,6 +17,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 @Service
@@ -61,8 +64,26 @@ public class TeamService {
         return new TeamCreateResponseDto(teamEntity);
     }
 
-    // 랜덤 초대 코드 생성 메서드
+    @Transactional
+    public List<TeamListResponseDto> getMyTeams(String email) {
+        UserEntity user = findUser(email);
+        List<TeamListResponseDto> responses = new ArrayList<>();
 
+        List<TeamUserEntity> teamUserEntities = teamUserRepository.findAllByUserEntity(user);
+        if (teamUserEntities.isEmpty()) {
+            throw new ApiException(TeamMessage.TEAM_NOT_FOUND);
+        }
+
+        for (TeamUserEntity teamUserEntity : teamUserEntities) {
+            TeamEntity teamEntity = teamUserEntity.getTeamEntity();
+            TeamListResponseDto response = new TeamListResponseDto(teamEntity, teamUserEntity);
+            responses.add(response);
+        }
+
+        return responses;
+    }
+
+    // 랜덤 초대 코드 생성 메서드
     private String generateInviteCode() {
         StringBuilder code = new StringBuilder();
         Random random = new Random();
@@ -74,6 +95,7 @@ public class TeamService {
 
         return code.toString();
     }
+
     private TeamEntity findTeamByTeamCode(String teamCode) {
         return teamRepository.findByTeamCode(teamCode).orElseThrow(() -> new ApiException(TeamMessage.TEAM_NOT_FOUND));
     }
