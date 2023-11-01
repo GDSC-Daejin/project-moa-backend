@@ -8,6 +8,7 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.BatchSize;
 
 import java.util.Date;
 
@@ -31,9 +32,13 @@ public class GifticonEntity {
     @Enumerated(EnumType.STRING)
     private Status status;
     private Date usedDate;
+
+    @BatchSize(size = 100)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private UserEntity user;
+
+    @BatchSize(size = 100)
     @ManyToOne
     @JoinColumn(name = "category_id")
     private CategoryEntity category;

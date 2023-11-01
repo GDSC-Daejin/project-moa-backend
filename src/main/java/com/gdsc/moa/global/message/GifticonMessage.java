@@ -16,7 +16,8 @@ public enum GifticonMessage implements ResponseMessage {
     GIFTICON_NOT_FOUND("해당 기프티콘이 없습니다.", HttpStatus.BAD_REQUEST),
     GIFTICON_NOT_BELONG_TO_USER("해당 기프티콘이 유저에게 속해있지 않습니다.", HttpStatus.BAD_REQUEST),
     CATEGORY_CREATE_SUCCESS("카테고리 생성 성공", HttpStatus.OK),
-    CATEGORY_NOT_FOUND("해당 카테고리가 없습니다.", HttpStatus.BAD_REQUEST),;
+    CATEGORY_NOT_FOUND("해당 카테고리가 없습니다.", HttpStatus.BAD_REQUEST),
+    GIFTICON_GET_SUCCESS("기프티콘 조회 성공", HttpStatus.OK),;
     private final String message;
     private final HttpStatus status;
     }
