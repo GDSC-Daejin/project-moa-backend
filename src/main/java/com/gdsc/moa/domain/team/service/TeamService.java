@@ -1,8 +1,14 @@
 package com.gdsc.moa.domain.team.service;
 
+import com.gdsc.moa.domain.gifticon.entity.GifticonEntity;
+import com.gdsc.moa.domain.gifticon.repository.GifticonRepository;
+import com.gdsc.moa.domain.team.dto.request.ShareTeamGifticonRequestDto;
 import com.gdsc.moa.domain.team.dto.request.TeamJoinRequestDto;
+import com.gdsc.moa.domain.team.dto.response.ShareTeamGifticonResponseDto;
 import com.gdsc.moa.domain.team.dto.response.TeamListResponseDto;
+import com.gdsc.moa.domain.team.entity.TeamGifticonEntity;
 import com.gdsc.moa.domain.team.entity.TeamUserEntity;
+import com.gdsc.moa.domain.team.repository.TeamGifticonRepository;
 import com.gdsc.moa.domain.team.repository.TeamRepository;
 import com.gdsc.moa.domain.team.dto.request.TeamCreateRequestDto;
 import com.gdsc.moa.domain.team.dto.response.TeamCreateResponseDto;
@@ -28,6 +34,9 @@ public class TeamService {
     private final TeamRepository teamRepository;
     private final UserRepository userRepository;
     private final TeamUserRepository teamUserRepository;
+    private final GifticonRepository gifticonRepository;
+    private final TeamGifticonRepository teamGifticonRepository;
+
     private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     private static final int CODE_LENGTH = 16;
 
@@ -88,11 +97,25 @@ public class TeamService {
     public void leaveTeam(Long teamId, String email) {
         UserEntity user = findUser(email);
         TeamEntity teamEntity = findTeamByTeamCode(teamId.toString());
-        TeamUserEntity teamUserEntity = teamUserRepository.findByTeamEntityAndUserEntity(teamEntity, user).orElseThrow(() -> new ApiException(TeamMessage.TEAM_NOT_FOUND));
+        TeamUserEntity teamUserEntity = findTeamUserEntity(teamEntity, user);
         //방장일 경우
         if(Objects.equals(teamEntity.getUser().getEmail(), email))
             teamRepository.delete(teamEntity);
+        // TODO: 10/31/23 cascade 
         teamUserRepository.delete(teamUserEntity);
+    }
+
+    public ShareTeamGifticonResponseDto shareTeamGifticon(ShareTeamGifticonRequestDto shareTeamGifticonRequestDto, String email) {
+        UserEntity user = findUser(email);
+        TeamEntity teamEntity = teamRepository.findByTeamId(shareTeamGifticonRequestDto.getTeamId());
+        TeamUserEntity teamUserEntity = findTeamUserEntity(teamEntity, user);
+        GifticonEntity gifticonEntity = gifticonRepository.findByGifticonId(shareTeamGifticonRequestDto.getGifticonId());
+
+        TeamGifticonEntity teamGifticonEntity = new TeamGifticonEntity(teamUserEntity, gifticonEntity);
+        if (teamGifticonRepository.findByIdTeamUserEntityAndIdGifticonEntity(teamUserEntity, gifticonEntity).isPresent())
+            throw new ApiException(TeamMessage.TEAM_GIFTICON_ALREADY_EXIST);
+        teamGifticonRepository.save(teamGifticonEntity);
+        return new ShareTeamGifticonResponseDto(teamGifticonEntity);
     }
 
 
@@ -119,5 +142,9 @@ public class TeamService {
 
     private UserEntity findUser(String email) {
         return userRepository.findByEmail(email).orElseThrow(() -> new ApiException(UserMessage.USER_NOT_FOUND));
+    }
+
+    private TeamUserEntity findTeamUserEntity(TeamEntity teamEntity, UserEntity user) {
+        return teamUserRepository.findByTeamEntityAndUserEntity(teamEntity, user).orElseThrow(() -> new ApiException(TeamMessage.TEAM_NOT_FOUND));
     }
 }

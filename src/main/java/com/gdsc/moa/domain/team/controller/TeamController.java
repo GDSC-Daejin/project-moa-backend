@@ -1,12 +1,13 @@
 package com.gdsc.moa.domain.team.controller;
 
+import com.gdsc.moa.domain.team.dto.request.ShareTeamGifticonRequestDto;
 import com.gdsc.moa.domain.team.dto.request.TeamCreateRequestDto;
 import com.gdsc.moa.domain.team.dto.request.TeamJoinRequestDto;
+import com.gdsc.moa.domain.team.dto.response.ShareTeamGifticonResponseDto;
 import com.gdsc.moa.domain.team.dto.response.TeamCreateResponseDto;
 import com.gdsc.moa.domain.team.dto.response.TeamListResponseDto;
 import com.gdsc.moa.domain.team.service.TeamService;
 import com.gdsc.moa.global.dto.MoaApiResponse;
-import com.gdsc.moa.global.exception.ApiException;
 import com.gdsc.moa.global.jwt.oauth.UserInfo;
 import com.gdsc.moa.global.message.TeamMessage;
 import lombok.RequiredArgsConstructor;
@@ -39,13 +40,17 @@ public class TeamController {
         return MoaApiResponse.createResponse(responses, TeamMessage.TEAM_GET_SUCCESS);
     }
 
-    // TODO: 10/31/22 팀 탈퇴
     @DeleteMapping("/{teamId}")
     public MoaApiResponse<TeamCreateResponseDto> leaveTeam(@PathVariable Long teamId, @AuthenticationPrincipal UserInfo userInfo) {
         teamService.leaveTeam(teamId, userInfo.getEmail());
         return MoaApiResponse.createResponse(null, TeamMessage.TEAM_LEAVE_SUCCESS);
     }
     // TODO: 10/31/22 팀에 기프티콘 추가
+    @PostMapping("/gifticon")
+    public MoaApiResponse<ShareTeamGifticonResponseDto> shareTeamGifticon(@RequestBody ShareTeamGifticonRequestDto shareTeamGifticonRequestDto, @AuthenticationPrincipal UserInfo userInfo) {
+        ShareTeamGifticonResponseDto response = teamService.shareTeamGifticon(shareTeamGifticonRequestDto, userInfo.getEmail());
+        return MoaApiResponse.createResponse(response, TeamMessage.TEAM_SHARE_GIFTICON_SUCCESS);
+    }
     // TODO: 10/31/22 팀에 해당되는 기프티콘 가져오기
 
 }
