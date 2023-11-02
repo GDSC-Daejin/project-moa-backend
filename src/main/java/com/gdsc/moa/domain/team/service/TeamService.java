@@ -91,7 +91,8 @@ public class TeamService {
 
         for (TeamUserEntity teamUserEntity : teamUserEntities) {
             TeamEntity teamEntity = teamUserEntity.getTeamEntity();
-            TeamListResponseDto response = new TeamListResponseDto(teamEntity, teamUserEntity);
+            List<TeamUserEntity> teamMembers = teamUserRepository.findAllByTeamEntity(teamEntity);
+            TeamListResponseDto response = new TeamListResponseDto(teamEntity, teamMembers);
             responses.add(response);
         }
 
@@ -110,22 +111,24 @@ public class TeamService {
         teamUserRepository.delete(teamUserEntity);
     }
 
+    @Transactional
     public ShareTeamGifticonResponseDto shareTeamGifticon(ShareTeamGifticonRequestDto shareTeamGifticonRequestDto, String email) {
         UserEntity user = findUser(email);
         TeamEntity teamEntity = teamRepository.findByTeamId(shareTeamGifticonRequestDto.getTeamId());
         TeamUserEntity teamUserEntity = findTeamUserEntity(teamEntity, user);
-        Optional<GifticonEntity> optionalGifticonEntity = gifticonRepository.findById(shareTeamGifticonRequestDto.getGifticonId());
+        GifticonEntity gifticonEntity = gifticonRepository.findById(shareTeamGifticonRequestDto.getGifticonId()).orElse(null);
 
-        if (optionalGifticonEntity.isPresent()) {
-            GifticonEntity gifticonEntity = optionalGifticonEntity.get();
-            if (teamGifticonRepository.findByTeamUserEntityAndGifticonEntity(teamUserEntity, gifticonEntity).isPresent()) {
+        if (gifticonEntity != null) {
+            // Check if the gifticon is already shared
+            if (isGifticonAlreadyShared(teamUserEntity, gifticonEntity)) {
                 throw new ApiException(TeamMessage.TEAM_GIFTICON_ALREADY_EXIST);
             }
+
+            // Create and save the TeamGifticonEntity
             TeamGifticonEntity teamGifticonEntity = new TeamGifticonEntity(teamUserEntity, gifticonEntity);
-            teamGifticonRepository.save(teamGifticonEntity);
+            teamGifticonEntity = teamGifticonRepository.save(teamGifticonEntity);
             return new ShareTeamGifticonResponseDto(teamGifticonEntity);
         } else {
-            // Handle the case when the GifticonEntity is not found
             throw new ApiException(GifticonMessage.GIFTICON_NOT_FOUND);
         }
     }
@@ -158,6 +161,15 @@ public class TeamService {
 
     private TeamUserEntity findTeamUserEntity(TeamEntity teamEntity, UserEntity user) {
         return teamUserRepository.findByTeamEntityAndUserEntity(teamEntity, user).orElseThrow(() -> new ApiException(TeamMessage.TEAM_NOT_FOUND));
+    }
+
+    private void shareGifticonWithTeam(TeamUserEntity teamUserEntity, GifticonEntity gifticonEntity) {
+        TeamGifticonEntity teamGifticonEntity = new TeamGifticonEntity(teamUserEntity, gifticonEntity);
+        teamGifticonRepository.save(teamGifticonEntity);
+    }
+
+    private boolean isGifticonAlreadyShared(TeamUserEntity teamUserEntity, GifticonEntity gifticonEntity) {
+        return teamGifticonRepository.findByTeamUserEntityAndGifticonEntity(teamUserEntity, gifticonEntity).isPresent();
     }
 
     @Transactional

@@ -17,4 +17,6 @@ public interface TeamUserRepository extends JpaRepository<TeamUserEntity, Long> 
     Optional<TeamUserEntity> findByUserEntity(UserEntity user);
 
     List<TeamUserEntity> findAllByUserEntity(UserEntity user);
+
+    List<TeamUserEntity> findAllByTeamEntity(TeamEntity teamEntity);
 }
