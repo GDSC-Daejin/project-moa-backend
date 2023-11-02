@@ -27,6 +27,7 @@ public class GifticonResponseDto {
     private Date usedDate;
     private AuthorDto author;
     private CategoryResponseDto category;
+    private String gifticonMoney;
 
     @Builder
     public GifticonResponseDto(GifticonEntity savedGifticon) {
@@ -37,6 +38,7 @@ public class GifticonResponseDto {
         this.exchangePlace = savedGifticon.getExchangePlace();
         this.dueDate = savedGifticon.getDueDate();
         this.gifticonType = savedGifticon.getGifticonType();
+        this.gifticonMoney = savedGifticon.getGifticonMoney();
         this.orderNumber = savedGifticon.getOrderNumber();
         this.status = savedGifticon.getStatus();
         this.usedDate = savedGifticon.getUsedDate();

@@ -29,6 +29,7 @@ public class GifticonEntity {
     private String orderNumber;
     @Enumerated(EnumType.STRING)
     private GifticonType gifticonType;
+    private String gifticonMoney;
     @Enumerated(EnumType.STRING)
     private Status status;
     private Date usedDate;
@@ -51,6 +52,7 @@ public class GifticonEntity {
                           Date dueDate,
                           String orderNumber,
                           GifticonType gifticonType,
+                          String gifticonMoney,
                           Status status,
                           Date usedDate,
                           UserEntity user) {
@@ -61,6 +63,7 @@ public class GifticonEntity {
         this.dueDate = dueDate;
         this.orderNumber = orderNumber;
         this.gifticonType = gifticonType;
+        this.gifticonMoney = gifticonMoney;
         this.status = status;
         this.usedDate = usedDate;
         this.user = user;
@@ -75,6 +78,7 @@ public class GifticonEntity {
         this.dueDate = gifticonRequestDto.getDueDate();
         this.orderNumber = gifticonRequestDto.getOrderNumber();
         this.gifticonType = gifticonRequestDto.getGifticonType();
+        this.gifticonMoney = gifticonRequestDto.getGifticonMoney();
         this.status = Status.AVAILABLE;
         this.usedDate = null;
         this.user = user;
@@ -90,6 +94,7 @@ public class GifticonEntity {
         this.dueDate = gifticonUpdateRequestDto.getDueDate();
         this.orderNumber = gifticonUpdateRequestDto.getOrderNumber();
         this.gifticonType = gifticonUpdateRequestDto.getGifticonType();
+        this.gifticonMoney = gifticonUpdateRequestDto.getGifticonMoney();
         this.status = Status.AVAILABLE;
         this.usedDate = null;
         this.user = user;
@@ -106,6 +111,7 @@ public class GifticonEntity {
         this.dueDate = gifticonEntity.getDueDate();
         this.orderNumber = gifticonEntity.getOrderNumber();
         this.gifticonType = gifticonEntity.getGifticonType();
+        this.gifticonMoney = gifticonEntity.getGifticonMoney();
         this.status = gifticonEntity.getStatus();
         this.usedDate = gifticonEntity.getUsedDate();
         this.user = gifticonEntity.getUser();
@@ -114,9 +120,6 @@ public class GifticonEntity {
 
 
     //TODO: 10/15/23  사용한 유저 map 으로 json형식으로 만들기
-
-    // TODO: 10/15/23 category 생성시 추가
-    //private Category category;
 
 
 }
