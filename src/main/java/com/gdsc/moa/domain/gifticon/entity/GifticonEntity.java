@@ -97,6 +97,22 @@ public class GifticonEntity {
 
     }
 
+    public GifticonEntity(GifticonEntity gifticonEntity) {
+        this.id = gifticonEntity.getId();
+        this.name = gifticonEntity.getName();
+        this.barcodeNumber = gifticonEntity.getBarcodeNumber();
+        this.gifticonImagePath = gifticonEntity.getGifticonImagePath();
+        this.exchangePlace = gifticonEntity.getExchangePlace();
+        this.dueDate = gifticonEntity.getDueDate();
+        this.orderNumber = gifticonEntity.getOrderNumber();
+        this.gifticonType = gifticonEntity.getGifticonType();
+        this.status = gifticonEntity.getStatus();
+        this.usedDate = gifticonEntity.getUsedDate();
+        this.user = gifticonEntity.getUser();
+        this.category = gifticonEntity.getCategory();
+    }
+
+
     //TODO: 10/15/23  사용한 유저 map 으로 json형식으로 만들기
 
     // TODO: 10/15/23 category 생성시 추가

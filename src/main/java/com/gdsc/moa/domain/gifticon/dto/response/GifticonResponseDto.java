@@ -28,6 +28,7 @@ public class GifticonResponseDto {
     private AuthorDto author;
     private CategoryResponseDto category;
 
+    @Builder
     public GifticonResponseDto(GifticonEntity savedGifticon) {
         this.id = savedGifticon.getId();
         this.name = savedGifticon.getName();

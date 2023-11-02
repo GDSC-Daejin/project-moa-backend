@@ -21,7 +21,6 @@ public interface GifticonRepository extends JpaRepository<GifticonEntity, Long> 
     @Query("UPDATE GifticonEntity g SET g.status = 'UNAVAILABLE' WHERE g.dueDate = current_date")
     void updateGifticonsWithDueDateToday();
 
-    GifticonEntity findByGifticonId(Long gifticonId);
 
     @Query("SELECT g FROM GifticonEntity g WHERE g.user = :user AND g.status = :status")
     Page<GifticonEntity> findByUserAndStatus(@Param("user") UserEntity user, @Param("status") Status status, Pageable pageable);
