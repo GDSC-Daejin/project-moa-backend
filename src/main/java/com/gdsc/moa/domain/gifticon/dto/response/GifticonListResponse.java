@@ -26,7 +26,7 @@ public class GifticonListResponse {
 
     @Builder
     public GifticonListResponse(GifticonEntity gifticonEntity){
-        this.id = gifticonEntity.getId();
+        this.id = gifticonEntity.getGifticonId();
         this.name = gifticonEntity.getName();
         this.gifticonImagePath = gifticonEntity.getGifticonImagePath();
         this.exchangePlace = gifticonEntity.getExchangePlace();

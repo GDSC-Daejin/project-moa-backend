@@ -15,7 +15,7 @@ import java.util.Date;
 @Getter
 @Builder
 public class GifticonResponseDto {
-    private Long id;
+    private Long gifticonId;
     private String name;
     private String barcodeNumber;
     private String gifticonImagePath;
@@ -30,7 +30,7 @@ public class GifticonResponseDto {
 
     @Builder
     public GifticonResponseDto(GifticonEntity savedGifticon) {
-        this.id = savedGifticon.getId();
+        this.gifticonId = savedGifticon.getGifticonId();
         this.name = savedGifticon.getName();
         this.barcodeNumber = savedGifticon.getBarcodeNumber();
         this.gifticonImagePath = savedGifticon.getGifticonImagePath();

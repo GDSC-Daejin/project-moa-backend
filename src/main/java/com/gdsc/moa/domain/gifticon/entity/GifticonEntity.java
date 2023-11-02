@@ -20,7 +20,7 @@ public class GifticonEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "gifticon_id")
-    private Long id;
+    private Long gifticonId;
     private String name;
     private String barcodeNumber;
     private String gifticonImagePath;
@@ -82,7 +82,7 @@ public class GifticonEntity {
     }
     @Builder
     public GifticonEntity(GifticonUpdateRequestDto gifticonUpdateRequestDto, UserEntity user,CategoryEntity category){
-        this.id = gifticonUpdateRequestDto.getId();
+        this.gifticonId = gifticonUpdateRequestDto.getId();
         this.name = gifticonUpdateRequestDto.getName();
         this.barcodeNumber = gifticonUpdateRequestDto.getBarcodeNumber();
         this.gifticonImagePath = gifticonUpdateRequestDto.getGifticonImagePath();
@@ -98,7 +98,7 @@ public class GifticonEntity {
     }
 
     public GifticonEntity(GifticonEntity gifticonEntity) {
-        this.id = gifticonEntity.getId();
+        this.gifticonId = gifticonEntity.getGifticonId();
         this.name = gifticonEntity.getName();
         this.barcodeNumber = gifticonEntity.getBarcodeNumber();
         this.gifticonImagePath = gifticonEntity.getGifticonImagePath();

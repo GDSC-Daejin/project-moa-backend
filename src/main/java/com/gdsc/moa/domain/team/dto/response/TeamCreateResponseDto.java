@@ -10,14 +10,14 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Getter
 public class TeamCreateResponseDto {
-    private Long id;
+    private Long teamId;
     private String teamCode;
     private String teamName;
     private Status status;
     private String teamLeaderNickname;
 
     public TeamCreateResponseDto(TeamEntity teamEntity) {
-        this.id = teamEntity.getId();
+        this.teamId = teamEntity.getId();
         this.teamCode = teamEntity.getTeamCode();
         this.teamName = teamEntity.getTeamName();
         this.status = Status.AVAILABLE;
