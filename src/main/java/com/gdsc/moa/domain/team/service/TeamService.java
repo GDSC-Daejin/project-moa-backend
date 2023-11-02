@@ -1,5 +1,6 @@
 package com.gdsc.moa.domain.team.service;
 
+import com.gdsc.moa.domain.gifticon.dto.response.GifticonResponseDto;
 import com.gdsc.moa.domain.gifticon.entity.GifticonEntity;
 import com.gdsc.moa.domain.gifticon.repository.GifticonRepository;
 import com.gdsc.moa.domain.team.dto.request.ShareTeamGifticonRequestDto;
@@ -17,16 +18,20 @@ import com.gdsc.moa.domain.team.repository.TeamUserRepository;
 import com.gdsc.moa.domain.user.entity.UserEntity;
 import com.gdsc.moa.domain.user.repository.UserRepository;
 import com.gdsc.moa.global.exception.ApiException;
+import com.gdsc.moa.global.message.GifticonMessage;
 import com.gdsc.moa.global.message.TeamMessage;
 import com.gdsc.moa.global.message.UserMessage;
+import com.gdsc.moa.global.paging.PagingResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Random;
+import java.lang.reflect.Field;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -109,17 +114,24 @@ public class TeamService {
         UserEntity user = findUser(email);
         TeamEntity teamEntity = teamRepository.findByTeamId(shareTeamGifticonRequestDto.getTeamId());
         TeamUserEntity teamUserEntity = findTeamUserEntity(teamEntity, user);
-        GifticonEntity gifticonEntity = gifticonRepository.findByGifticonId(shareTeamGifticonRequestDto.getGifticonId());
+        Optional<GifticonEntity> optionalGifticonEntity = gifticonRepository.findById(shareTeamGifticonRequestDto.getGifticonId());
 
-        TeamGifticonEntity teamGifticonEntity = new TeamGifticonEntity(teamUserEntity, gifticonEntity);
-        if (teamGifticonRepository.findByIdTeamUserEntityAndIdGifticonEntity(teamUserEntity, gifticonEntity).isPresent())
-            throw new ApiException(TeamMessage.TEAM_GIFTICON_ALREADY_EXIST);
-        teamGifticonRepository.save(teamGifticonEntity);
-        return new ShareTeamGifticonResponseDto(teamGifticonEntity);
+        if (optionalGifticonEntity.isPresent()) {
+            GifticonEntity gifticonEntity = optionalGifticonEntity.get();
+            if (teamGifticonRepository.findByTeamUserEntityAndGifticonEntity(teamUserEntity, gifticonEntity).isPresent()) {
+                throw new ApiException(TeamMessage.TEAM_GIFTICON_ALREADY_EXIST);
+            }
+            TeamGifticonEntity teamGifticonEntity = new TeamGifticonEntity(teamUserEntity, gifticonEntity);
+            teamGifticonRepository.save(teamGifticonEntity);
+            return new ShareTeamGifticonResponseDto(teamGifticonEntity);
+        } else {
+            // Handle the case when the GifticonEntity is not found
+            throw new ApiException(GifticonMessage.GIFTICON_NOT_FOUND);
+        }
     }
 
-
     // 랜덤 초대 코드 생성 메서드
+
     private String generateInviteCode() {
         StringBuilder code = new StringBuilder();
         Random random = new Random();
@@ -147,4 +159,24 @@ public class TeamService {
     private TeamUserEntity findTeamUserEntity(TeamEntity teamEntity, UserEntity user) {
         return teamUserRepository.findByTeamEntityAndUserEntity(teamEntity, user).orElseThrow(() -> new ApiException(TeamMessage.TEAM_NOT_FOUND));
     }
+
+    @Transactional
+    public PagingResponse<GifticonResponseDto> getTeamGifticon(Long teamId, Pageable pageable, String email) {
+        UserEntity user = findUser(email);
+        TeamEntity teamEntity = teamRepository.findByTeamId(teamId);
+        Page<TeamGifticonEntity> teamGifticonEntity = teamGifticonRepository.findAllByTeamId(teamId, pageable);
+        return createTeamGifticonPagingResponse(teamGifticonEntity, pageable);
+
+        
+    }
+
+    private PagingResponse<GifticonResponseDto> createTeamGifticonPagingResponse(Page<TeamGifticonEntity> teamGifticonEntity, Pageable pageable) {
+        List<GifticonResponseDto> gifticonResponseDtos = teamGifticonEntity.stream()
+                .map(TeamGifticonEntity::getGifticonEntity)
+                .map(GifticonResponseDto::new)
+                .collect(Collectors.toList());
+        return new PagingResponse<>(new PageImpl<>(gifticonResponseDtos, pageable, teamGifticonEntity.getTotalElements()));
+    }
+
+
 }
