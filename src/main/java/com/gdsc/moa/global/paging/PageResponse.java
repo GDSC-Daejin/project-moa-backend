@@ -12,13 +12,13 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class PagingResponse<T> {
+public class PageResponse<T> {
 
     private List<T> data;
     private Long totalCount;
     private Long nextPage;
 
-    public PagingResponse(Page<T> pageResponse) {
+    public PageResponse(Page<T> pageResponse) {
         this.data = pageResponse.getContent();
         this.totalCount = pageResponse.getTotalElements();
         this.nextPage = pageResponse.hasNext() ? Long.valueOf(pageResponse.getNumber() + 1) : null;

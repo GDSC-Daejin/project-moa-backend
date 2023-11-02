@@ -21,7 +21,7 @@ import com.gdsc.moa.global.exception.ApiException;
 import com.gdsc.moa.global.message.GifticonMessage;
 import com.gdsc.moa.global.message.TeamMessage;
 import com.gdsc.moa.global.message.UserMessage;
-import com.gdsc.moa.global.paging.PagingResponse;
+import com.gdsc.moa.global.paging.PageResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -29,7 +29,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.lang.reflect.Field;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -173,7 +172,7 @@ public class TeamService {
     }
 
     @Transactional
-    public PagingResponse<GifticonResponseDto> getTeamGifticon(Long teamId, Pageable pageable, String email) {
+    public PageResponse<GifticonResponseDto> getTeamGifticon(Long teamId, Pageable pageable, String email) {
         UserEntity user = findUser(email);
         TeamEntity teamEntity = teamRepository.findByTeamId(teamId);
         Page<TeamGifticonEntity> teamGifticonEntity = teamGifticonRepository.findAllByTeamId(teamId, pageable);
@@ -182,12 +181,12 @@ public class TeamService {
         
     }
 
-    private PagingResponse<GifticonResponseDto> createTeamGifticonPagingResponse(Page<TeamGifticonEntity> teamGifticonEntity, Pageable pageable) {
+    private PageResponse<GifticonResponseDto> createTeamGifticonPagingResponse(Page<TeamGifticonEntity> teamGifticonEntity, Pageable pageable) {
         List<GifticonResponseDto> gifticonResponseDtos = teamGifticonEntity.stream()
                 .map(TeamGifticonEntity::getGifticonEntity)
                 .map(GifticonResponseDto::new)
                 .collect(Collectors.toList());
-        return new PagingResponse<>(new PageImpl<>(gifticonResponseDtos, pageable, teamGifticonEntity.getTotalElements()));
+        return new PageResponse<>(new PageImpl<>(gifticonResponseDtos, pageable, teamGifticonEntity.getTotalElements()));
     }
 
 

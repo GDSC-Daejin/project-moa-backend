@@ -14,7 +14,7 @@ import com.gdsc.moa.domain.user.repository.UserRepository;
 import com.gdsc.moa.global.exception.ApiException;
 import com.gdsc.moa.global.message.GifticonMessage;
 import com.gdsc.moa.global.message.UserMessage;
-import com.gdsc.moa.global.paging.PagingResponse;
+import com.gdsc.moa.global.paging.PageResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -23,7 +23,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -74,7 +73,7 @@ public class GifticonService {
 
     // TODO: 10/25/23 리스트들 팀 추가시 수정하기
     @Transactional
-    public PagingResponse<GifticonListResponse> getUsableGifticon(Pageable pageable, String email) {
+    public PageResponse<GifticonListResponse> getUsableGifticon(Pageable pageable, String email) {
         UserEntity user = findUser(email);
         Page<GifticonEntity> gifticonEntities = gifticonRepository.findByUserAndStatus(user, Status.AVAILABLE, pageable);
 
@@ -82,7 +81,7 @@ public class GifticonService {
     }
 
     @Transactional
-    public PagingResponse<GifticonListResponse> getDisableGifticon(Pageable pageable, String email) {
+    public PageResponse<GifticonListResponse> getDisableGifticon(Pageable pageable, String email) {
         UserEntity user = findUser(email);
         Page<GifticonEntity> gifticonEntities = gifticonRepository.findByUserAndStatus(user, Status.UNAVAILABLE, pageable);
 
@@ -90,7 +89,7 @@ public class GifticonService {
     }
 
     @Transactional
-    public PagingResponse<GifticonListResponse> getAllGifticon(Pageable pageable, String email) {
+    public PageResponse<GifticonListResponse> getAllGifticon(Pageable pageable, String email) {
         UserEntity user = findUser(email);
         Page<GifticonEntity> gifticonEntities = gifticonRepository.findByUser(user, pageable);
 
@@ -98,7 +97,7 @@ public class GifticonService {
     }
 
     @Transactional
-    public PagingResponse<GifticonListResponse> getGifticonByCategory(Pageable pageable, Long categoryId, String email) {
+    public PageResponse<GifticonListResponse> getGifticonByCategory(Pageable pageable, Long categoryId, String email) {
         UserEntity user = findUser(email);
         CategoryEntity category = findCategory(categoryId);
         Page<GifticonEntity> gifticonEntities = gifticonRepository.findByUserAndCategory(user, category, pageable);
@@ -107,21 +106,21 @@ public class GifticonService {
     }
 
     @Transactional
-    public PagingResponse<GifticonListResponse> getRecentGifticon(Pageable pageable, String email) {
+    public PageResponse<GifticonListResponse> getRecentGifticon(Pageable pageable, String email) {
         UserEntity user = findUser(email);
         Page<GifticonEntity> gifticonEntities = gifticonRepository.findBYUserOrderByDueDateDesc (user,Status.UNAVAILABLE, pageable);
 
         return createPagingResponse(gifticonEntities);
     }
 
-    private PagingResponse<GifticonListResponse> createPagingResponse(Page<GifticonEntity> gifticonEntities) {
+    private PageResponse<GifticonListResponse> createPagingResponse(Page<GifticonEntity> gifticonEntities) {
         List<GifticonListResponse> gifticonResponses = gifticonEntities.stream()
                 .map(GifticonListResponse::new)
                 .collect(Collectors.toList());
 
         Page<GifticonListResponse> responsePage = new PageImpl<>(gifticonResponses, gifticonEntities.getPageable(), gifticonEntities.getTotalElements());
 
-        return new PagingResponse<>(responsePage);
+        return new PageResponse<>(responsePage);
     }
 
     private GifticonEntity finduserandgifticon(Long gifticonId, String email) {

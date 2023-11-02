@@ -11,7 +11,7 @@ import com.gdsc.moa.domain.team.service.TeamService;
 import com.gdsc.moa.global.dto.MoaApiResponse;
 import com.gdsc.moa.global.jwt.oauth.UserInfo;
 import com.gdsc.moa.global.message.TeamMessage;
-import com.gdsc.moa.global.paging.PagingResponse;
+import com.gdsc.moa.global.paging.PageResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -64,9 +64,9 @@ public class TeamController {
 
     @Operation(summary = "팀에 속한 기프티곤 가져오기")
     @GetMapping("/gifticon/{teamId}")
-    public MoaApiResponse<PagingResponse<GifticonResponseDto>> getTeamGifticon(@PathVariable Long teamId, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @AuthenticationPrincipal UserInfo userInfo) {
+    public MoaApiResponse<PageResponse<GifticonResponseDto>> getTeamGifticon(@PathVariable Long teamId, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @AuthenticationPrincipal UserInfo userInfo) {
         Pageable pageable = PageRequest.of(page, size);
-        PagingResponse<GifticonResponseDto> response = teamService.getTeamGifticon(teamId, pageable, userInfo.getEmail());
+        PageResponse<GifticonResponseDto> response = teamService.getTeamGifticon(teamId, pageable, userInfo.getEmail());
         return MoaApiResponse.createResponse(response, TeamMessage.TEAM_GET_GIFTICON_SUCCESS);
     }
 
