@@ -1,5 +1,6 @@
 package com.gdsc.moa.domain.team.dto.response;
 
+import com.gdsc.moa.domain.gifticon.dto.response.GifticonResponseDto;
 import com.gdsc.moa.domain.gifticon.entity.GifticonEntity;
 import com.gdsc.moa.domain.team.entity.TeamGifticonEntity;
 import lombok.Getter;
@@ -11,8 +12,7 @@ public class ShareTeamGifticonResponseDto {
     private Long id;
     private String teamName;
     private String teamLeaderNickname;
-    private GifticonEntity gifticonEntity;
-    // TODO: 10/31/23 이부분 수정하
+    private GifticonResponseDto gifticon;
 
     public ShareTeamGifticonResponseDto(Long id, String teamName, String teamLeaderNickname) {
         this.id = id;
@@ -24,6 +24,6 @@ public class ShareTeamGifticonResponseDto {
         this.id = teamGifticonEntity.getId();
         this.teamName = teamGifticonEntity.getTeamUserEntity().getTeamEntity().getTeamName();
         this.teamLeaderNickname = teamGifticonEntity.getTeamUserEntity().getTeamEntity().getUser().getNickname();
-        this.gifticonEntity = teamGifticonEntity.getGifticonEntity();
+        this.gifticon = new GifticonResponseDto(teamGifticonEntity.getGifticonEntity());
     }
 }
