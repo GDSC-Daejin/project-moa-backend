@@ -16,6 +16,7 @@ public class TeamListResponseDto {
     private Long id;
     private String teamCode;
     private String teamName;
+    private String teamImage;
     private String teamLeaderNickname;
     private List<TeamMember> teamMembers; // 여러 개의 TeamMember를 담을 리스트
 
@@ -38,6 +39,7 @@ public class TeamListResponseDto {
         this.id = teamEntity.getId();
         this.teamCode = teamEntity.getTeamCode();
         this.teamName = teamEntity.getTeamName();
+        this.teamImage = teamEntity.getTeamImage();
         this.teamLeaderNickname = teamEntity.getUser().getNickname();
         this.teamMembers = teamMembers.stream()
                 .map(teamMember -> TeamMember.builder()

@@ -17,6 +17,7 @@ public class TeamEntity {
     private Long id;
     private String teamCode;
     private String teamName;
+    private String teamImage;
     @Enumerated(EnumType.STRING)
     private Status status;
 
@@ -27,6 +28,7 @@ public class TeamEntity {
 
     public TeamEntity(TeamCreateRequestDto teamCreateRequestDto, UserEntity user, String inviteCode) {
         this.teamName = teamCreateRequestDto.getTeamName();
+        this.teamImage = teamCreateRequestDto.getTeamImage();
         this.teamCode = inviteCode;
         this.status = Status.AVAILABLE;
         this.user = user;
