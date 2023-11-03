@@ -99,4 +99,21 @@ public class AuthService {
         if(!tokenProvider.validateToken(refreshToken))
             throw new ApiException(UserMessage.REFRESH_TOKEN_INVALID);
     }
+
+    public void logout(String email, LogoutRequest logoutRequest) {
+        String refreshToken = logoutRequest.refreshToken();
+        validateRefreshToken(refreshToken);
+        RefreshTokenEntity refreshTokenEntity = checkExistingRefreshToken(findUserByEmail(email).getId());
+        if(refreshTokenEntity == null || !refreshToken.equals(refreshTokenEntity.getRefreshToken()))
+            throw new ApiException(UserMessage.REFRESH_TOKEN_INVALID);
+        refreshTokenRepository.delete(refreshTokenEntity);
+    }
+
+    public void deleteUser(String email) {
+        UserEntity user = findUserByEmail(email);
+        if(user == null) {
+            throw new ApiException(UserMessage.USER_NOT_FOUND);
+        }
+        userRepository.delete(user);
+    }
 }

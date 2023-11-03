@@ -38,4 +38,8 @@ public class UserEntity extends BaseTimeEntity {
         this.socialType = socialType;
         this.status = status;
     }
+
+    public void updateNickName(String nickname) {
+        this.nickname = nickname;
+    }
 }

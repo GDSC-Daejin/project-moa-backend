@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -28,16 +29,26 @@ public class AuthController {
     }
 
     @PostMapping("/token")
-    public MoaApiResponse<TokenResponse> reissue(@AuthenticationPrincipal UserInfo user, @RequestBody LogoutRequest logoutRequest){
+    public MoaApiResponse<TokenResponse> reissue(@AuthenticationPrincipal UserInfo user,
+                                                 @RequestBody LogoutRequest logoutRequest){
         TokenResponse response = authService.reissue(user.getEmail(), logoutRequest);
         return MoaApiResponse.createResponse(response, UserMessage.REISSUE_SUCCESS);
     }
 
     //로그아웃
+    @PostMapping("/auth/user")
+    public MoaApiResponse<String> logout(@AuthenticationPrincipal UserInfo user,
+                                         @RequestBody LogoutRequest logoutRequest){
+        authService.logout(user.getEmail(), logoutRequest);
+        return MoaApiResponse.createResponse(null, UserMessage.LOGOUT_SUCCESS);
+    }
 
     //회원 탈퇴
-
-    //닉네임 변경
+    @PutMapping("/auth/user")
+    public MoaApiResponse<String> deleteUser(@AuthenticationPrincipal UserInfo user){
+        authService.deleteUser(user.getEmail());
+        return MoaApiResponse.createResponse(null, UserMessage.DELETE_USER_SUCCESS);
+    }
 
 }
 

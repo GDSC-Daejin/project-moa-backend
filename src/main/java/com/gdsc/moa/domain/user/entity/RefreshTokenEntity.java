@@ -16,7 +16,7 @@ import org.hibernate.annotations.OnDeleteAction;
 
 @Getter
 @RequiredArgsConstructor
-@Entity @Table(name = "tb_refresh_token")
+@Entity @Table(name = "refresh_token")
 public class RefreshTokenEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
