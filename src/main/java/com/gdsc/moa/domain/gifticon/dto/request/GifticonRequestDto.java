@@ -2,6 +2,7 @@ package com.gdsc.moa.domain.gifticon.dto.request;
 
 
 import com.gdsc.moa.domain.gifticon.entity.GifticonType;
+import jakarta.annotation.Nullable;
 import lombok.Getter;
 
 import java.util.Date;
@@ -16,5 +17,6 @@ public class GifticonRequestDto {
     private String orderNumber;
     private GifticonType gifticonType;
     private String gifticonMoney;
+    @Nullable
     private Long categoryId;
 }
