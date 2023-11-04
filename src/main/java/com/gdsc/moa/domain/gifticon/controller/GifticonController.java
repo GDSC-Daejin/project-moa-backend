@@ -91,4 +91,27 @@ public class GifticonController {
         PageResponse<GifticonListResponse> response = gifticonService.getRecentGifticon(pageable, user.getEmail());
         return MoaApiResponse.createResponse(response, GifticonMessage.GIFTICON_GET_SUCCESS);
     }
+
+
+    @Operation(summary = "내 기프티콘 개수")
+    @GetMapping("/count")
+    public MoaApiResponse<Long> getGifticonCount(@AuthenticationPrincipal UserInfo user) {
+        Long response = gifticonService.getGifticonCount(user.getEmail());
+        return MoaApiResponse.createResponse(response, GifticonMessage.GIFTICON_GET_SUCCESS);
+    }
+
+    @Operation(summary = "사용가능한 기프티콘 개수")
+    @GetMapping("/usable_count")
+    public MoaApiResponse<Long> getUsableGifticonCount(@AuthenticationPrincipal UserInfo user) {
+        Long response = gifticonService.getUsableGifticonCount(user.getEmail());
+        return MoaApiResponse.createResponse(response, GifticonMessage.GIFTICON_GET_SUCCESS);
+    }
+
+    @Operation(summary = "사용한 기프티콘 개수")
+    @GetMapping("/used_count")
+    public MoaApiResponse<Long> getUsedGifticonCount(@AuthenticationPrincipal UserInfo user) {
+        Long response = gifticonService.getUsedGifticonCount(user.getEmail());
+        return MoaApiResponse.createResponse(response, GifticonMessage.GIFTICON_GET_SUCCESS);
+    }
+
 }

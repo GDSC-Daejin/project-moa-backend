@@ -131,6 +131,11 @@ public class GifticonService {
         return createPagingResponse(gifticonEntities);
     }
 
+    public Long getGifticonCount(String email) {
+        UserEntity user = findUser(email);
+        return gifticonRepository.countByUser(user);
+    }
+
     private PageResponse<GifticonListResponse> createPagingResponse(Page<GifticonEntity> gifticonEntities) {
         List<GifticonListResponse> gifticonResponses = gifticonEntities.stream()
                 .map(GifticonListResponse::new)
@@ -156,5 +161,15 @@ public class GifticonService {
 
     private CategoryEntity findCategory(Long categoryId) {
         return categoryRepository.findById(categoryId).orElseThrow(() -> new ApiException(GifticonMessage.CATEGORY_NOT_FOUND));
+    }
+
+    public Long getUsableGifticonCount(String email) {
+        UserEntity user = findUser(email);
+        return gifticonRepository.countByUserAndStatus(user, Status.AVAILABLE);
+    }
+
+    public Long getUsedGifticonCount(String email) {
+        UserEntity user = findUser(email);
+        return gifticonRepository.countByUserAndStatus(user, Status.UNAVAILABLE);
     }
 }
