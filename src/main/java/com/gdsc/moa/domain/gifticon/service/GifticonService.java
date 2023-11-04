@@ -38,7 +38,13 @@ public class GifticonService {
     @Transactional
     public GifticonResponseDto createGifticon(GifticonRequestDto gifticonRequestDto, String email) {
         UserEntity user = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("해당 유저가 없습니다. email=" + email));
-        CategoryEntity category = findCategory(gifticonRequestDto.getCategoryId());
+        CategoryEntity category;
+        if (findCategory(gifticonRequestDto.getCategoryId()) == null) {
+            category = new CategoryEntity();
+            category.createCategory("미분류", user);
+        } else {
+            category = findCategory(gifticonRequestDto.getCategoryId());
+        }
         GifticonEntity gifticonEntity = new GifticonEntity(gifticonRequestDto,user,category);
         GifticonEntity savedGifticon = gifticonRepository.save(gifticonEntity);
 
