@@ -8,6 +8,7 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.BatchSize;
 
 import java.util.Date;
 
@@ -19,7 +20,7 @@ public class GifticonEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "gifticon_id")
-    private Long id;
+    private Long gifticonId;
     private String name;
     private String barcodeNumber;
     private String gifticonImagePath;
@@ -28,12 +29,17 @@ public class GifticonEntity {
     private String orderNumber;
     @Enumerated(EnumType.STRING)
     private GifticonType gifticonType;
+    private String gifticonMoney;
     @Enumerated(EnumType.STRING)
     private Status status;
     private Date usedDate;
+
+    @BatchSize(size = 100)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private UserEntity user;
+
+    @BatchSize(size = 100)
     @ManyToOne
     @JoinColumn(name = "category_id")
     private CategoryEntity category;
@@ -46,6 +52,7 @@ public class GifticonEntity {
                           Date dueDate,
                           String orderNumber,
                           GifticonType gifticonType,
+                          String gifticonMoney,
                           Status status,
                           Date usedDate,
                           UserEntity user) {
@@ -56,6 +63,7 @@ public class GifticonEntity {
         this.dueDate = dueDate;
         this.orderNumber = orderNumber;
         this.gifticonType = gifticonType;
+        this.gifticonMoney = gifticonMoney;
         this.status = status;
         this.usedDate = usedDate;
         this.user = user;
@@ -70,6 +78,7 @@ public class GifticonEntity {
         this.dueDate = gifticonRequestDto.getDueDate();
         this.orderNumber = gifticonRequestDto.getOrderNumber();
         this.gifticonType = gifticonRequestDto.getGifticonType();
+        this.gifticonMoney = gifticonRequestDto.getGifticonMoney();
         this.status = Status.AVAILABLE;
         this.usedDate = null;
         this.user = user;
@@ -77,7 +86,7 @@ public class GifticonEntity {
     }
     @Builder
     public GifticonEntity(GifticonUpdateRequestDto gifticonUpdateRequestDto, UserEntity user,CategoryEntity category){
-        this.id = gifticonUpdateRequestDto.getId();
+        this.gifticonId = gifticonUpdateRequestDto.getId();
         this.name = gifticonUpdateRequestDto.getName();
         this.barcodeNumber = gifticonUpdateRequestDto.getBarcodeNumber();
         this.gifticonImagePath = gifticonUpdateRequestDto.getGifticonImagePath();
@@ -85,6 +94,7 @@ public class GifticonEntity {
         this.dueDate = gifticonUpdateRequestDto.getDueDate();
         this.orderNumber = gifticonUpdateRequestDto.getOrderNumber();
         this.gifticonType = gifticonUpdateRequestDto.getGifticonType();
+        this.gifticonMoney = gifticonUpdateRequestDto.getGifticonMoney();
         this.status = Status.AVAILABLE;
         this.usedDate = null;
         this.user = user;
@@ -92,10 +102,24 @@ public class GifticonEntity {
 
     }
 
-    //TODO: 10/15/23  사용한 유저 map 으로 json형식으로 만들기
+    public GifticonEntity(GifticonEntity gifticonEntity) {
+        this.gifticonId = gifticonEntity.getGifticonId();
+        this.name = gifticonEntity.getName();
+        this.barcodeNumber = gifticonEntity.getBarcodeNumber();
+        this.gifticonImagePath = gifticonEntity.getGifticonImagePath();
+        this.exchangePlace = gifticonEntity.getExchangePlace();
+        this.dueDate = gifticonEntity.getDueDate();
+        this.orderNumber = gifticonEntity.getOrderNumber();
+        this.gifticonType = gifticonEntity.getGifticonType();
+        this.gifticonMoney = gifticonEntity.getGifticonMoney();
+        this.status = gifticonEntity.getStatus();
+        this.usedDate = gifticonEntity.getUsedDate();
+        this.user = gifticonEntity.getUser();
+        this.category = gifticonEntity.getCategory();
+    }
 
-    // TODO: 10/15/23 category 생성시 추가
-    //private Category category;
+
+    //TODO: 10/15/23  사용한 유저 map 으로 json형식으로 만들기
 
 
 }

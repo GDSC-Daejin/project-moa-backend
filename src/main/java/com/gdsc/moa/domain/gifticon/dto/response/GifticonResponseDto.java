@@ -15,7 +15,7 @@ import java.util.Date;
 @Getter
 @Builder
 public class GifticonResponseDto {
-    private Long id;
+    private Long gifticonId;
     private String name;
     private String barcodeNumber;
     private String gifticonImagePath;
@@ -27,15 +27,18 @@ public class GifticonResponseDto {
     private Date usedDate;
     private AuthorDto author;
     private CategoryResponseDto category;
+    private String gifticonMoney;
 
+    @Builder
     public GifticonResponseDto(GifticonEntity savedGifticon) {
-        this.id = savedGifticon.getId();
+        this.gifticonId = savedGifticon.getGifticonId();
         this.name = savedGifticon.getName();
         this.barcodeNumber = savedGifticon.getBarcodeNumber();
         this.gifticonImagePath = savedGifticon.getGifticonImagePath();
         this.exchangePlace = savedGifticon.getExchangePlace();
         this.dueDate = savedGifticon.getDueDate();
         this.gifticonType = savedGifticon.getGifticonType();
+        this.gifticonMoney = savedGifticon.getGifticonMoney();
         this.orderNumber = savedGifticon.getOrderNumber();
         this.status = savedGifticon.getStatus();
         this.usedDate = savedGifticon.getUsedDate();
