@@ -7,6 +7,11 @@ import com.gdsc.moa.global.jwt.dto.TokenResponse;
 import com.gdsc.moa.domain.user.service.AuthService;
 import com.gdsc.moa.global.jwt.oauth.UserInfo;
 import com.gdsc.moa.global.message.UserMessage;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -28,6 +33,7 @@ public class AuthController {
         return MoaApiResponse.createResponse(response, UserMessage.LOGIN_SUCCESS);
     }
 
+    @Operation(summary = "토큰 재발급 API", description = "AccessToken 만료 시 RefreshToken을 가지고 AccessToken, RefreshToken을 재발급 받을 수 있습니다.")
     @PostMapping("/token")
     public MoaApiResponse<TokenResponse> reissue(@AuthenticationPrincipal UserInfo user,
                                                  @RequestBody LogoutRequest logoutRequest){
@@ -35,16 +41,16 @@ public class AuthController {
         return MoaApiResponse.createResponse(response, UserMessage.REISSUE_SUCCESS);
     }
 
-    //로그아웃
-    @PostMapping("/auth/user")
+    @Operation(summary = "로그아웃 API")
+    @PostMapping("/auth/user/logout")
     public MoaApiResponse<String> logout(@AuthenticationPrincipal UserInfo user,
                                          @RequestBody LogoutRequest logoutRequest){
         authService.logout(user.getEmail(), logoutRequest);
         return MoaApiResponse.createResponse(null, UserMessage.LOGOUT_SUCCESS);
     }
 
-    //회원 탈퇴
-    @PutMapping("/auth/user")
+    @Operation(summary = "회원 탈퇴 API")
+    @PostMapping("/auth/user")
     public MoaApiResponse<String> deleteUser(@AuthenticationPrincipal UserInfo user){
         authService.deleteUser(user.getEmail());
         return MoaApiResponse.createResponse(null, UserMessage.DELETE_USER_SUCCESS);
