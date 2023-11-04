@@ -26,4 +26,9 @@ public class CategoryEntity {
         this.categoryName = name;
         this.user = user;
     }
+
+    public void updateCategory(String categoryName, UserEntity user) {
+        this.categoryName = categoryName;
+        this.user = user;
+    }
 }

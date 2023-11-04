@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -39,9 +40,20 @@ public class GifticonService {
     public GifticonResponseDto createGifticon(GifticonRequestDto gifticonRequestDto, String email) {
         UserEntity user = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("해당 유저가 없습니다. email=" + email));
         CategoryEntity category;
-        if (findCategory(gifticonRequestDto.getCategoryId()) == null) {
-            category = new CategoryEntity();
-            category.createCategory("미분류", user);
+
+        if (gifticonRequestDto.getCategoryId() == null) {
+            // Check if a category named "미분류" already exists for the user
+            Optional<CategoryEntity> uncategorizedCategory = categoryRepository.findByUserAndCategoryName(user, "미분류");
+
+            if (uncategorizedCategory.isPresent()) {
+                // If "미분류" category already exists, use it
+                category = uncategorizedCategory.get();
+            } else {
+                // If "미분류" category doesn't exist, create it
+                category = new CategoryEntity();
+                category.createCategory("미분류", user);
+                category = categoryRepository.save(category);
+            }
         } else {
             category = findCategory(gifticonRequestDto.getCategoryId());
         }
