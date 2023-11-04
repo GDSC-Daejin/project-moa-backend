@@ -8,10 +8,9 @@ import com.gdsc.moa.global.jwt.oauth.UserInfo;
 import com.gdsc.moa.global.message.GifticonMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -23,4 +22,11 @@ public class CategoryController {
         CategoryResponseDto response = categoryService.createCategory(categoryName,user.getEmail());
         return MoaApiResponse.createResponse(response, GifticonMessage.CATEGORY_CREATE_SUCCESS);
     }
+
+    @GetMapping("")
+    MoaApiResponse<List<CategoryResponseDto>>getCategory(@AuthenticationPrincipal UserInfo user){
+        List<CategoryResponseDto> response = categoryService.getCategory(user.getEmail());
+        return MoaApiResponse.createResponse(response, GifticonMessage.GIFTICON_GET_SUCCESS);
+    }
+
 }
