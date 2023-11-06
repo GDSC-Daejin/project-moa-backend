@@ -3,6 +3,7 @@ package com.gdsc.moa.domain.gifticon.controller;
 import com.gdsc.moa.domain.gifticon.dto.request.GifticonRequestDto;
 import com.gdsc.moa.domain.gifticon.dto.request.GifticonUpdateRequestDto;
 import com.gdsc.moa.domain.gifticon.dto.request.UseMoneyRequestDto;
+import com.gdsc.moa.domain.gifticon.dto.response.GifticonDetailResponseDto;
 import com.gdsc.moa.domain.gifticon.dto.response.GifticonResponseDto;
 import com.gdsc.moa.domain.gifticon.dto.response.GifticonListResponse;
 import com.gdsc.moa.domain.gifticon.dto.response.UseMoneyResponseDto;
@@ -42,8 +43,9 @@ public class GifticonController {
 
     @Operation(summary = "기프티콘 조회(상세페이지)")
     @GetMapping("/{gifticonId}")
-    public MoaApiResponse<GifticonResponseDto> getGifticon(@PathVariable Long gifticonId, @AuthenticationPrincipal UserInfo user) {
-        GifticonResponseDto response = gifticonService.getGifticonDetail(gifticonId, user.getEmail());
+    public MoaApiResponse<GifticonDetailResponseDto> getGifticon(@PathVariable Long gifticonId, @AuthenticationPrincipal UserInfo user) {
+        List<TeamListResponseDto> teamList = teamService.getTeamListByGifticon(gifticonId, user.getEmail());
+        GifticonDetailResponseDto response = gifticonService.getGifticonDetail(gifticonId, user.getEmail(),teamList);
         return MoaApiResponse.createResponse(response, GifticonMessage.GIFTICON_GET_SUCCESS);
     }
 
@@ -124,15 +126,10 @@ public class GifticonController {
     }
 
 
-    @Operation(summary = "팀불러오기 (기프티콘을 공유하였던 팀)")
-    @GetMapping("/get_team/{gifticonId}")
-    public MoaApiResponse<List<TeamListResponseDto>> getTeamListByGifticon(@PathVariable Long gifticonId, @AuthenticationPrincipal UserInfo user) {
-        List<TeamListResponseDto> responseDto = teamService.getTeamListByGifticon(gifticonId, user.getEmail());
-        return MoaApiResponse.createResponse(responseDto, TeamMessage.TEAM_GET_SUCCESS);
 
     @Operation(summary = "금액권 사용금액 입력")
     @PostMapping("/money")
-    public MoaApiResponse<UseMoneyResponseDto>addMoneyHistory(@RequestBody UseMoneyRequestDto useMoneyRequestDto, @AuthenticationPrincipal UserInfo user){
+    public MoaApiResponse<UseMoneyResponseDto> addMoneyHistory(@RequestBody UseMoneyRequestDto useMoneyRequestDto, @AuthenticationPrincipal UserInfo user){
         UseMoneyResponseDto response = gifticonService.addMoneyHistory(useMoneyRequestDto,user.getEmail());
         return MoaApiResponse.createResponse(response, GifticonMessage.MONEY_HISTORY_CREATE_SUCCESS);
 
