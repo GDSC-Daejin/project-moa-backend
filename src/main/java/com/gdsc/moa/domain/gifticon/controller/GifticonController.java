@@ -2,8 +2,11 @@ package com.gdsc.moa.domain.gifticon.controller;
 
 import com.gdsc.moa.domain.gifticon.dto.request.GifticonRequestDto;
 import com.gdsc.moa.domain.gifticon.dto.request.GifticonUpdateRequestDto;
+import com.gdsc.moa.domain.gifticon.dto.request.UseMoneyRequestDto;
 import com.gdsc.moa.domain.gifticon.dto.response.GifticonResponseDto;
 import com.gdsc.moa.domain.gifticon.dto.response.GifticonListResponse;
+import com.gdsc.moa.domain.gifticon.dto.response.UseMoneyResponseDto;
+import com.gdsc.moa.domain.gifticon.entity.GifticonHistoryEntity;
 import com.gdsc.moa.domain.gifticon.service.GifticonService;
 import com.gdsc.moa.global.dto.MoaApiResponse;
 import com.gdsc.moa.global.jwt.oauth.UserInfo;
@@ -112,6 +115,14 @@ public class GifticonController {
     public MoaApiResponse<Long> getUsedGifticonCount(@AuthenticationPrincipal UserInfo user) {
         Long response = gifticonService.getUsedGifticonCount(user.getEmail());
         return MoaApiResponse.createResponse(response, GifticonMessage.GIFTICON_GET_SUCCESS);
+    }
+
+    @Operation(summary = "기프티콘 사용금액 입력")
+    @PostMapping("/money")
+    public MoaApiResponse<UseMoneyResponseDto>addMoneyHistory(@RequestBody UseMoneyRequestDto useMoneyRequestDto, @AuthenticationPrincipal UserInfo user){
+        UseMoneyResponseDto response = gifticonService.addMoneyHistory(useMoneyRequestDto,user.getEmail());
+        return MoaApiResponse.createResponse(response, GifticonMessage.GIFTICON_CREATE_SUCCESS);
+
     }
 
 }

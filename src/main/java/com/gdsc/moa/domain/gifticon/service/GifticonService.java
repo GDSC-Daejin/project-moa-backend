@@ -4,10 +4,14 @@ import com.gdsc.moa.domain.category.entity.CategoryEntity;
 import com.gdsc.moa.domain.category.repository.CategoryRepository;
 import com.gdsc.moa.domain.gifticon.dto.request.GifticonRequestDto;
 import com.gdsc.moa.domain.gifticon.dto.request.GifticonUpdateRequestDto;
+import com.gdsc.moa.domain.gifticon.dto.request.UseMoneyRequestDto;
 import com.gdsc.moa.domain.gifticon.dto.response.GifticonResponseDto;
 import com.gdsc.moa.domain.gifticon.dto.response.GifticonListResponse;
+import com.gdsc.moa.domain.gifticon.dto.response.UseMoneyResponseDto;
 import com.gdsc.moa.domain.gifticon.entity.GifticonEntity;
+import com.gdsc.moa.domain.gifticon.entity.GifticonHistoryEntity;
 import com.gdsc.moa.domain.gifticon.entity.Status;
+import com.gdsc.moa.domain.gifticon.repository.GifticonHistoryRepository;
 import com.gdsc.moa.domain.gifticon.repository.GifticonRepository;
 import com.gdsc.moa.domain.user.entity.UserEntity;
 import com.gdsc.moa.domain.user.repository.UserRepository;
@@ -34,6 +38,7 @@ public class GifticonService {
     private final UserRepository userRepository;
     private final GifticonRepository gifticonRepository;
     private final CategoryRepository categoryRepository;
+    private final GifticonHistoryRepository gifticonHistoryRepository;
 
     //Gifticon 생성
     @Transactional
@@ -129,6 +134,21 @@ public class GifticonService {
         Page<GifticonEntity> gifticonEntities = gifticonRepository.findBYUserOrderByDueDateDesc (user,Status.UNAVAILABLE, pageable);
 
         return createPagingResponse(gifticonEntities);
+    }
+
+    @Transactional
+    public UseMoneyResponseDto addMoneyHistory(UseMoneyRequestDto useMoneyRequestDto, String email) {
+        UserEntity user = findUser(email);
+        GifticonEntity gifticonEntity = findGifticon(useMoneyRequestDto.getGifticonId());
+        GifticonHistoryEntity gifticonLastHistory = gifticonHistoryRepository.findLastHistory(gifticonEntity);
+        if (gifticonLastHistory == null)
+            gifticonLastHistory = new GifticonHistoryEntity(user, gifticonEntity, useMoneyRequestDto.getMoney());
+        else
+            gifticonLastHistory = new GifticonHistoryEntity(user, gifticonEntity, gifticonLastHistory.getLeftPrice(), useMoneyRequestDto.getMoney());
+        GifticonHistoryEntity savedHistory =gifticonHistoryRepository.save(gifticonLastHistory);
+
+
+        return new UseMoneyResponseDto(savedHistory);
     }
 
     public Long getGifticonCount(String email) {
