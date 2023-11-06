@@ -5,6 +5,7 @@ import com.gdsc.moa.domain.category.repository.CategoryRepository;
 import com.gdsc.moa.domain.gifticon.dto.request.GifticonRequestDto;
 import com.gdsc.moa.domain.gifticon.dto.request.GifticonUpdateRequestDto;
 import com.gdsc.moa.domain.gifticon.dto.request.UseMoneyRequestDto;
+import com.gdsc.moa.domain.gifticon.dto.response.GifticonDetailResponseDto;
 import com.gdsc.moa.domain.gifticon.dto.response.GifticonResponseDto;
 import com.gdsc.moa.domain.gifticon.dto.response.GifticonListResponse;
 import com.gdsc.moa.domain.gifticon.dto.response.UseMoneyResponseDto;
@@ -13,6 +14,8 @@ import com.gdsc.moa.domain.gifticon.entity.GifticonHistoryEntity;
 import com.gdsc.moa.domain.gifticon.entity.Status;
 import com.gdsc.moa.domain.gifticon.repository.GifticonHistoryRepository;
 import com.gdsc.moa.domain.gifticon.repository.GifticonRepository;
+import com.gdsc.moa.domain.team.dto.response.TeamListResponseDto;
+import com.gdsc.moa.domain.team.entity.TeamGifticonEntity;
 import com.gdsc.moa.domain.user.entity.UserEntity;
 import com.gdsc.moa.domain.user.repository.UserRepository;
 import com.gdsc.moa.global.exception.ApiException;
@@ -73,10 +76,10 @@ public class GifticonService {
         gifticonRepository.delete(gifticonEntity);
     }
     @Transactional
-    public GifticonResponseDto getGifticonDetail(Long gifticonId, String email) {
+    public GifticonDetailResponseDto getGifticonDetail(Long gifticonId, String email, List<TeamListResponseDto> teamList) {
         GifticonEntity gifticonEntity = finduserandgifticon(gifticonId, email);
-
-        return new GifticonResponseDto(gifticonEntity);
+        GifticonResponseDto GifticonResponseDto = new GifticonResponseDto(gifticonEntity);
+        return new GifticonDetailResponseDto(GifticonResponseDto, teamList);
     }
     @Transactional
     public GifticonResponseDto updateGifticon(GifticonUpdateRequestDto gifticonUpdateRequestDto, String email) {
