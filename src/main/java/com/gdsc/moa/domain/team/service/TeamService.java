@@ -3,6 +3,7 @@ package com.gdsc.moa.domain.team.service;
 import com.gdsc.moa.domain.gifticon.dto.response.GifticonResponseDto;
 import com.gdsc.moa.domain.gifticon.entity.GifticonEntity;
 import com.gdsc.moa.domain.gifticon.repository.GifticonRepository;
+import com.gdsc.moa.domain.team.dto.TeamMember;
 import com.gdsc.moa.domain.team.dto.request.ShareTeamGifticonRequestDto;
 import com.gdsc.moa.domain.team.dto.request.TeamJoinRequestDto;
 import com.gdsc.moa.domain.team.dto.response.ShareTeamGifticonResponseDto;
@@ -132,6 +133,23 @@ public class TeamService {
         }
     }
 
+    public List<TeamListResponseDto> getTeamListByGifticon(Long gifticonId, String email) {
+        UserEntity user = findUser(email);
+        Optional<GifticonEntity> gifticonEntity = gifticonRepository.findById(gifticonId);
+
+        List<TeamGifticonEntity> teamGifticonEntities = teamGifticonRepository.findByGifticonEntity(gifticonEntity);
+
+        return teamGifticonEntities.stream()
+                .map(TeamGifticonEntity::getTeamUserEntity)
+                .map(TeamUserEntity::getTeamEntity)
+                .distinct()
+                .map(teamEntity -> {
+                    List<TeamUserEntity> teamMembers = teamUserRepository.findAllByTeamEntity(teamEntity);
+                    return new TeamListResponseDto(teamEntity, teamMembers);
+                })
+                .collect(Collectors.toList());
+    }
+
     // 랜덤 초대 코드 생성 메서드
 
     private String generateInviteCode() {
@@ -178,7 +196,7 @@ public class TeamService {
         Page<TeamGifticonEntity> teamGifticonEntity = teamGifticonRepository.findAllByTeamId(teamId, pageable);
         return createTeamGifticonPagingResponse(teamGifticonEntity, pageable);
 
-        
+
     }
 
     private PageResponse<GifticonResponseDto> createTeamGifticonPagingResponse(Page<TeamGifticonEntity> teamGifticonEntity, Pageable pageable) {

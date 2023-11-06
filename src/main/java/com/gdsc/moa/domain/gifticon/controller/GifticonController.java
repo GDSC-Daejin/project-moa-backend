@@ -8,9 +8,12 @@ import com.gdsc.moa.domain.gifticon.dto.response.GifticonListResponse;
 import com.gdsc.moa.domain.gifticon.dto.response.UseMoneyResponseDto;
 import com.gdsc.moa.domain.gifticon.entity.GifticonHistoryEntity;
 import com.gdsc.moa.domain.gifticon.service.GifticonService;
+import com.gdsc.moa.domain.team.dto.response.TeamListResponseDto;
+import com.gdsc.moa.domain.team.service.TeamService;
 import com.gdsc.moa.global.dto.MoaApiResponse;
 import com.gdsc.moa.global.jwt.oauth.UserInfo;
 import com.gdsc.moa.global.message.GifticonMessage;
+import com.gdsc.moa.global.message.TeamMessage;
 import com.gdsc.moa.global.paging.PageResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +30,7 @@ import java.util.List;
 @RequestMapping("/api/v1/gifticon")
 public class GifticonController {
     private final GifticonService gifticonService;
+    private final TeamService teamService;
 
     @Operation(summary = "기프티콘 생성")
     @PostMapping("")
@@ -119,6 +123,13 @@ public class GifticonController {
         return MoaApiResponse.createResponse(response, GifticonMessage.GIFTICON_GET_SUCCESS);
     }
 
+
+    @Operation(summary = "팀불러오기 (기프티콘을 공유하였던 팀)")
+    @GetMapping("/get_team/{gifticonId}")
+    public MoaApiResponse<List<TeamListResponseDto>> getTeamListByGifticon(@PathVariable Long gifticonId, @AuthenticationPrincipal UserInfo user) {
+        List<TeamListResponseDto> responseDto = teamService.getTeamListByGifticon(gifticonId, user.getEmail());
+        return MoaApiResponse.createResponse(responseDto, TeamMessage.TEAM_GET_SUCCESS);
+
     @Operation(summary = "금액권 사용금액 입력")
     @PostMapping("/money")
     public MoaApiResponse<UseMoneyResponseDto>addMoneyHistory(@RequestBody UseMoneyRequestDto useMoneyRequestDto, @AuthenticationPrincipal UserInfo user){
@@ -132,6 +143,7 @@ public class GifticonController {
     public MoaApiResponse<List<UseMoneyResponseDto>>getMoneyHistory(@PathVariable Long gifticonId, @AuthenticationPrincipal UserInfo user){
         List<UseMoneyResponseDto> responseDtos = gifticonService.getMoneyHistory(gifticonId, user.getEmail());
         return MoaApiResponse.createResponse(responseDtos, GifticonMessage.MONEY_HISTORY_GET_SUCCESS);
+
     }
 
 }
