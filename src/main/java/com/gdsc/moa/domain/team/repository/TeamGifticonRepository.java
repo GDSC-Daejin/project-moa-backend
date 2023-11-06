@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -17,4 +18,6 @@ public interface TeamGifticonRepository extends JpaRepository<TeamGifticonEntity
 
     @Query("select t from TeamGifticonEntity t where t.teamUserEntity.teamEntity.id = :teamId")
     Page<TeamGifticonEntity> findAllByTeamId(Long teamId, Pageable pageable);
+
+    List<TeamGifticonEntity> findByGifticonEntity(Optional<GifticonEntity> gifticonEntity);
 }
