@@ -19,7 +19,9 @@ public enum GifticonMessage implements ResponseMessage {
     CATEGORY_NOT_FOUND("해당 카테고리가 없습니다.", HttpStatus.BAD_REQUEST),
     GIFTICON_GET_SUCCESS("기프티콘 조회 성공", HttpStatus.OK),
     CATEGORY_DELETE_SUCCESS("카테고리 삭제 성공", HttpStatus.OK),
-    CATEGORY_ALREADY_EXIST("이미 존재하는 카테고리입니다.", HttpStatus.BAD_REQUEST),;
+    CATEGORY_ALREADY_EXIST("이미 존재하는 카테고리입니다.", HttpStatus.BAD_REQUEST),
+    MONEY_HISTORY_GET_SUCCESS("금액권 사용기록 조회 성공", HttpStatus.OK),
+    MONEY_HISTORY_CREATE_SUCCESS("금액권 사용기록 추가 성공", HttpStatus.OK),;
     private final String message;
     private final HttpStatus status;
     }

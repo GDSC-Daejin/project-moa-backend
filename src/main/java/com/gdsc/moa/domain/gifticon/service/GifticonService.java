@@ -151,6 +151,25 @@ public class GifticonService {
         return new UseMoneyResponseDto(savedHistory);
     }
 
+    public List<UseMoneyResponseDto> getMoneyHistory(Long gifticonId, String email) {
+        UserEntity user = findUser(email);
+        GifticonEntity gifticonEntity = findGifticon(gifticonId);
+        List<GifticonHistoryEntity> historyList = gifticonHistoryRepository.findAllByGifticon(gifticonEntity);
+
+        List<UseMoneyResponseDto> responseList = historyList.stream()
+                .map(history -> new UseMoneyResponseDto(
+                        history.getId(),
+                        history.getUsedPrice(),
+                        history.getLeftPrice(),
+                        history.getUsedDate(),
+                        history.getGifticon().getGifticonId(),
+                        history.getUser()
+                ))
+                .collect(Collectors.toList());
+
+        return responseList;
+    }
+
     public Long getGifticonCount(String email) {
         UserEntity user = findUser(email);
         return gifticonRepository.countByUser(user);
