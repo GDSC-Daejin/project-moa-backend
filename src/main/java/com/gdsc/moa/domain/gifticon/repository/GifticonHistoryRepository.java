@@ -12,7 +12,7 @@ import java.util.List;
 public interface GifticonHistoryRepository extends JpaRepository<GifticonHistoryEntity, Long> {
 
     @Query("SELECT g FROM GifticonHistoryEntity g WHERE g.gifticon = :gifticonEntity order by g.usedDate desc ")
-    GifticonHistoryEntity findLastHistory(GifticonEntity gifticonEntity);
+    List<GifticonHistoryEntity> findLastHistory(GifticonEntity gifticonEntity);
 
     @Query("SELECT g FROM GifticonHistoryEntity g WHERE g.gifticon = :gifticonEntity ORDER BY g.usedDate DESC")
     List<GifticonHistoryEntity> findAllByGifticon(GifticonEntity gifticonEntity);
