@@ -15,6 +15,7 @@ public class TeamCreateResponseDto {
     private String teamName;
     private Status status;
     private String teamLeaderNickname;
+    private String teamImage;
 
     public TeamCreateResponseDto(TeamEntity teamEntity) {
         this.teamId = teamEntity.getId();
@@ -22,5 +23,6 @@ public class TeamCreateResponseDto {
         this.teamName = teamEntity.getTeamName();
         this.status = Status.AVAILABLE;
         this.teamLeaderNickname = teamEntity.getUser().getNickname();
+        this.teamImage = teamEntity.getTeamImage();
     }
 }
