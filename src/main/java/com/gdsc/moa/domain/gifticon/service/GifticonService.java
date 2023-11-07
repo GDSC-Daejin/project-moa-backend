@@ -134,7 +134,7 @@ public class GifticonService {
     @Transactional
     public PageResponse<GifticonListResponse> getRecentGifticon(Pageable pageable, String email) {
         UserEntity user = findUser(email);
-        Page<GifticonEntity> gifticonEntities = gifticonRepository.findBYUserOrderByDueDateDesc (user,Status.UNAVAILABLE, pageable);
+        Page<GifticonEntity> gifticonEntities = gifticonRepository.findBYUserOrderByDueDateDesc (user,Status.AVAILABLE, pageable);
 
         return createPagingResponse(gifticonEntities);
     }
