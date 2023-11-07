@@ -15,7 +15,6 @@ import com.gdsc.moa.domain.gifticon.entity.Status;
 import com.gdsc.moa.domain.gifticon.repository.GifticonHistoryRepository;
 import com.gdsc.moa.domain.gifticon.repository.GifticonRepository;
 import com.gdsc.moa.domain.team.dto.response.TeamListResponseDto;
-import com.gdsc.moa.domain.team.entity.TeamGifticonEntity;
 import com.gdsc.moa.domain.user.entity.UserEntity;
 import com.gdsc.moa.domain.user.repository.UserRepository;
 import com.gdsc.moa.global.exception.ApiException;
@@ -171,6 +170,19 @@ public class GifticonService {
                 .collect(Collectors.toList());
 
         return responseList;
+    }
+
+    @Transactional
+    public GifticonDetailResponseDto useGifticon(Long gifticonId, String email, List<TeamListResponseDto> teamList) {
+        UserEntity user = findUser(email);
+        GifticonEntity gifticonEntity = findGifticon(gifticonId);
+        if(gifticonEntity.getStatus() == Status.AVAILABLE)
+            gifticonEntity.useGifticon();
+        else
+            gifticonEntity.cancelUseGifticon();
+        GifticonEntity savedGifticon = gifticonRepository.save(gifticonEntity);
+        return new GifticonDetailResponseDto(new GifticonResponseDto(savedGifticon), teamList);
+
     }
 
     public Long getGifticonCount(String email) {

@@ -45,7 +45,7 @@ public class GifticonController {
     @GetMapping("/{gifticonId}")
     public MoaApiResponse<GifticonDetailResponseDto> getGifticon(@PathVariable Long gifticonId, @AuthenticationPrincipal UserInfo user) {
         List<TeamListResponseDto> teamList = teamService.getTeamListByGifticon(gifticonId, user.getEmail());
-        GifticonDetailResponseDto response = gifticonService.getGifticonDetail(gifticonId, user.getEmail(),teamList);
+        GifticonDetailResponseDto response = gifticonService.getGifticonDetail(gifticonId, user.getEmail(), teamList);
         return MoaApiResponse.createResponse(response, GifticonMessage.GIFTICON_GET_SUCCESS);
     }
 
@@ -126,21 +126,27 @@ public class GifticonController {
     }
 
 
-
     @Operation(summary = "금액권 사용금액 입력")
     @PostMapping("/money")
-    public MoaApiResponse<UseMoneyResponseDto> addMoneyHistory(@RequestBody UseMoneyRequestDto useMoneyRequestDto, @AuthenticationPrincipal UserInfo user){
-        UseMoneyResponseDto response = gifticonService.addMoneyHistory(useMoneyRequestDto,user.getEmail());
+    public MoaApiResponse<UseMoneyResponseDto> addMoneyHistory(@RequestBody UseMoneyRequestDto useMoneyRequestDto, @AuthenticationPrincipal UserInfo user) {
+        UseMoneyResponseDto response = gifticonService.addMoneyHistory(useMoneyRequestDto, user.getEmail());
         return MoaApiResponse.createResponse(response, GifticonMessage.MONEY_HISTORY_CREATE_SUCCESS);
 
     }
 
     @Operation(summary = "금액권 사용기록 가져오기")
     @GetMapping("/money/{gifticonId}")
-    public MoaApiResponse<List<UseMoneyResponseDto>>getMoneyHistory(@PathVariable Long gifticonId, @AuthenticationPrincipal UserInfo user){
+    public MoaApiResponse<List<UseMoneyResponseDto>> getMoneyHistory(@PathVariable Long gifticonId, @AuthenticationPrincipal UserInfo user) {
         List<UseMoneyResponseDto> responseDtos = gifticonService.getMoneyHistory(gifticonId, user.getEmail());
         return MoaApiResponse.createResponse(responseDtos, GifticonMessage.MONEY_HISTORY_GET_SUCCESS);
 
     }
 
+    @Operation(summary = "기프티콘 사용완료버튼(다시누르면 취소)")
+    @PutMapping("/use/{gifticonId}")
+    public MoaApiResponse<GifticonDetailResponseDto> useGifticon(@PathVariable Long gifticonId, @AuthenticationPrincipal UserInfo user) {
+        List<TeamListResponseDto> teamList = teamService.getTeamListByGifticon(gifticonId, user.getEmail());
+        GifticonDetailResponseDto response = gifticonService.useGifticon(gifticonId, user.getEmail(),teamList);
+        return MoaApiResponse.createResponse(response, GifticonMessage.GIFTICON_USE_SUCCESS);
+    }
 }

@@ -118,6 +118,16 @@ public class GifticonEntity {
         this.category = gifticonEntity.getCategory();
     }
 
+    public void useGifticon() {
+        this.status = Status.UNAVAILABLE;
+        this.usedDate = new Date();
+    }
+
+    public void cancelUseGifticon() {
+        this.status = Status.AVAILABLE;
+        this.usedDate = null;
+    }
+
 
     //TODO: 10/15/23  사용한 유저 map 으로 json형식으로 만들기
 
