@@ -143,11 +143,11 @@ public class GifticonService {
     public UseMoneyResponseDto addMoneyHistory(UseMoneyRequestDto useMoneyRequestDto, String email) {
         UserEntity user = findUser(email);
         GifticonEntity gifticonEntity = findGifticon(useMoneyRequestDto.getGifticonId());
-        GifticonHistoryEntity gifticonLastHistory = gifticonHistoryRepository.findLastHistory(gifticonEntity);
-        if (gifticonLastHistory == null)
-            gifticonLastHistory = new GifticonHistoryEntity(user, gifticonEntity, useMoneyRequestDto.getMoney());
-        else
-            gifticonLastHistory = new GifticonHistoryEntity(user, gifticonEntity, gifticonLastHistory.getLeftPrice(), useMoneyRequestDto.getMoney());
+        List<GifticonHistoryEntity> gifticonLastHistoryList = gifticonHistoryRepository.findLastHistory(gifticonEntity);
+        GifticonHistoryEntity gifticonLastHistory = (gifticonLastHistoryList.isEmpty())
+                ? new GifticonHistoryEntity(user, gifticonEntity, useMoneyRequestDto.getMoney())
+                : new GifticonHistoryEntity(user, gifticonEntity, gifticonLastHistoryList.get(0).getLeftPrice(), useMoneyRequestDto.getMoney());
+
         GifticonHistoryEntity savedHistory =gifticonHistoryRepository.save(gifticonLastHistory);
 
 
