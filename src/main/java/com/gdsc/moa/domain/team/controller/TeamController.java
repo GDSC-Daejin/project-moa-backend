@@ -51,6 +51,20 @@ public class TeamController {
         return MoaApiResponse.createResponse(responses, TeamMessage.TEAM_GET_SUCCESS);
     }
 
+    @Operation(summary = "팀 수정하기")
+    @PutMapping("/{teamId}")
+    public MoaApiResponse<TeamCreateResponseDto> updateTeam(@PathVariable Long teamId, @RequestBody TeamCreateRequestDto teamCreateRequestDto, @AuthenticationPrincipal UserInfo userInfo) {
+        TeamCreateResponseDto response = teamService.updateTeam(teamId, teamCreateRequestDto, userInfo.getEmail());
+        return MoaApiResponse.createResponse(response, TeamMessage.TEAM_UPDATE_SUCCESS);
+    }
+
+    @Operation(summary = "팀 초대코드 갱신")
+    @PutMapping("/invite_code/{teamId}")
+    public MoaApiResponse<TeamCreateResponseDto> updateTeamInviteCode(@PathVariable Long teamId, @AuthenticationPrincipal UserInfo userInfo) {
+        TeamCreateResponseDto response = teamService.updateTeamInviteCode(teamId, userInfo.getEmail());
+        return MoaApiResponse.createResponse(response, TeamMessage.TEAM_UPDATE_INVITE_CODE_SUCCESS);
+    }
+
     @Operation(summary = "팀 탈퇴하기")
     @DeleteMapping("/{teamId}")
     public MoaApiResponse<TeamCreateResponseDto> leaveTeam(@PathVariable Long teamId, @AuthenticationPrincipal UserInfo userInfo) {

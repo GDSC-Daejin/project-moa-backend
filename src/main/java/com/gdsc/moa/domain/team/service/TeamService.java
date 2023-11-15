@@ -231,6 +231,26 @@ public class TeamService {
         Page<GifticonEntity> gifticonPage = findFilterGifticonEntities(pageable, user, request, allGifticonEntities);
         return createPagingResponse(gifticonPage);
     }
+
+    @Transactional
+    public TeamCreateResponseDto updateTeam(Long teamId, TeamCreateRequestDto teamCreateRequestDto, String email) {
+        UserEntity user = findUser(email);
+        TeamEntity teamEntity = teamRepository.findByTeamId(teamId);
+        checkTeamLeader(teamEntity, user);
+        teamEntity.updateTeam(teamCreateRequestDto);
+        return new TeamCreateResponseDto(teamEntity);
+    }
+
+    @Transactional
+    public TeamCreateResponseDto updateTeamInviteCode(Long teamId, String email) {
+        UserEntity user = findUser(email);
+        TeamEntity teamEntity = teamRepository.findByTeamId(teamId);
+        if(!Objects.equals(teamEntity.getUser().getEmail(), email))
+            throw new ApiException(TeamMessage.TEAM_NOT_LEADER);
+        teamEntity.updateTeamInviteCode(generateInviteCode());
+        return new TeamCreateResponseDto(teamEntity);
+    }
+
     private Page<GifticonEntity> findFilterGifticonEntities(Pageable pageable, UserEntity user, FilterListDto request, List<GifticonEntity> allGifticonEntities) {
         switch (request) {
             case ALL_NAME_DESC:
@@ -289,5 +309,10 @@ public class TeamService {
         Page<GifticonListResponse> responsePage = new PageImpl<>(gifticonResponses, gifticonEntities.getPageable(), gifticonEntities.getTotalElements());
 
         return new PageResponse<>(responsePage);
+    }
+
+    private void checkTeamLeader(TeamEntity teamEntity, UserEntity user) {
+        if(!Objects.equals(teamEntity.getUser(), user))
+            throw new ApiException(TeamMessage.TEAM_NOT_LEADER);
     }
 }
