@@ -1,5 +1,7 @@
 package com.gdsc.moa.domain.team.controller;
 
+import com.gdsc.moa.domain.gifticon.dto.request.FilterListDto;
+import com.gdsc.moa.domain.gifticon.dto.response.GifticonListResponse;
 import com.gdsc.moa.domain.gifticon.dto.response.GifticonResponseDto;
 import com.gdsc.moa.domain.team.dto.request.ShareTeamGifticonRequestDto;
 import com.gdsc.moa.domain.team.dto.request.TeamCreateRequestDto;
@@ -10,6 +12,7 @@ import com.gdsc.moa.domain.team.dto.response.TeamListResponseDto;
 import com.gdsc.moa.domain.team.service.TeamService;
 import com.gdsc.moa.global.dto.MoaApiResponse;
 import com.gdsc.moa.global.jwt.oauth.UserInfo;
+import com.gdsc.moa.global.message.GifticonMessage;
 import com.gdsc.moa.global.message.TeamMessage;
 import com.gdsc.moa.global.paging.PageResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -67,6 +70,14 @@ public class TeamController {
     public MoaApiResponse<PageResponse<GifticonResponseDto>> getTeamGifticon(@PathVariable Long teamId, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @AuthenticationPrincipal UserInfo userInfo) {
         Pageable pageable = PageRequest.of(page, size);
         PageResponse<GifticonResponseDto> response = teamService.getTeamGifticon(teamId, pageable, userInfo.getEmail());
+        return MoaApiResponse.createResponse(response, TeamMessage.TEAM_GET_GIFTICON_SUCCESS);
+    }
+
+    @Operation(summary = "팀 기프티콘 각종 목록 조회(필터)")
+    @GetMapping("/gifticon/{teamId}/{request}")
+    public MoaApiResponse<PageResponse<GifticonListResponse>> getAllTeamGifticonList(@PathVariable FilterListDto request, @PathVariable Long teamId, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @AuthenticationPrincipal UserInfo user) {
+        Pageable pageable = PageRequest.of(page, size);
+        PageResponse<GifticonListResponse> response = teamService.getAllTeamRequestGifticonList(teamId, request, pageable, user.getEmail());
         return MoaApiResponse.createResponse(response, TeamMessage.TEAM_GET_GIFTICON_SUCCESS);
     }
 

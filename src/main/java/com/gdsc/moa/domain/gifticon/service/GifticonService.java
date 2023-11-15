@@ -203,6 +203,11 @@ public class GifticonService {
     @Transactional
     public PageResponse<GifticonListResponse> getAllRequestGifticonList(FilterListDto request, Pageable pageable, String email) {
         UserEntity user = findUser(email);
+        Page<GifticonEntity> gifticonEntities = findFilterGifticonEntities(pageable, user, request);
+
+        return createPagingResponse(gifticonEntities);
+    }
+    private Page<GifticonEntity> findFilterGifticonEntities(Pageable pageable, UserEntity user, FilterListDto request) {
         Page<GifticonEntity> gifticonEntities;
         switch (request) {
             case ALL_NAME_ASC -> gifticonEntities = gifticonRepository.findByUserOrderByNameAsc(user, pageable);
@@ -222,7 +227,7 @@ public class GifticonService {
                     gifticonEntities = gifticonRepository.findByUserAndStatusOrderByDueDateDesc(user, Status.UNAVAILABLE, pageable);
             default -> gifticonEntities = gifticonRepository.findByUserOrderByNameDesc(user, pageable);
         }
-        return createPagingResponse(gifticonEntities);
+        return gifticonEntities;
     }
 
     private GifticonEntity finduserandgifticon(Long gifticonId, String email) {
