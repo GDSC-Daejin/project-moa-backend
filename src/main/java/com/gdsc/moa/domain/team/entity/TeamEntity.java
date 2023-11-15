@@ -33,4 +33,13 @@ public class TeamEntity {
         this.status = Status.AVAILABLE;
         this.user = user;
     }
+
+    public void updateTeam(TeamCreateRequestDto teamCreateRequestDto) {
+        this.teamName = teamCreateRequestDto.getTeamName();
+        this.teamImage = teamCreateRequestDto.getTeamImage();
+    }
+
+    public void updateTeamInviteCode(String generateInviteCode) {
+        this.teamCode = generateInviteCode;
+    }
 }

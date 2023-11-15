@@ -20,4 +20,6 @@ public interface TeamGifticonRepository extends JpaRepository<TeamGifticonEntity
     Page<TeamGifticonEntity> findAllByTeamId(Long teamId, Pageable pageable);
 
     List<TeamGifticonEntity> findByGifticonEntity(Optional<GifticonEntity> gifticonEntity);
+
+    List<TeamGifticonEntity> findAllByTeamUserEntity(TeamUserEntity teamUserEntity);
 }

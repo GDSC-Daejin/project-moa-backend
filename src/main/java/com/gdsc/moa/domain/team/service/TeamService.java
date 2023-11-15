@@ -1,8 +1,12 @@
 package com.gdsc.moa.domain.team.service;
 
+import com.gdsc.moa.domain.gifticon.dto.request.FilterListDto;
+import com.gdsc.moa.domain.gifticon.dto.response.GifticonListResponse;
 import com.gdsc.moa.domain.gifticon.dto.response.GifticonResponseDto;
 import com.gdsc.moa.domain.gifticon.entity.GifticonEntity;
+import com.gdsc.moa.domain.gifticon.entity.Status;
 import com.gdsc.moa.domain.gifticon.repository.GifticonRepository;
+import com.gdsc.moa.domain.gifticon.service.GifticonService;
 import com.gdsc.moa.domain.team.dto.TeamMember;
 import com.gdsc.moa.domain.team.dto.request.ShareTeamGifticonRequestDto;
 import com.gdsc.moa.domain.team.dto.request.TeamJoinRequestDto;
@@ -41,6 +45,7 @@ public class TeamService {
     private final TeamUserRepository teamUserRepository;
     private final GifticonRepository gifticonRepository;
     private final TeamGifticonRepository teamGifticonRepository;
+    private final GifticonService gifticonService;
 
     private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     private static final int CODE_LENGTH = 16;
@@ -208,4 +213,96 @@ public class TeamService {
     }
 
 
+    public PageResponse<GifticonListResponse> getAllTeamRequestGifticonList(Long teamId, FilterListDto request, Pageable pageable, String email) {
+        UserEntity user = findUser(email);
+        //팀
+        TeamEntity teamEntity = teamRepository.findByTeamId(teamId);
+        List<GifticonEntity> allGifticonEntities = new ArrayList<>();
+        //팀유저리스트[1,2,3]
+        List<TeamUserEntity> teamUserEntities = teamUserRepository.findAllByTeamEntity(teamEntity);
+        //- 반복문 : 팀유저엔티티 1개로 팀기프티콘 리스트들 찾기
+        for (TeamUserEntity teamUserEntity : teamUserEntities) {
+            List<TeamGifticonEntity>teamGifticonEntities = teamGifticonRepository.findAllByTeamUserEntity(teamUserEntity);
+            //- 반복문 : 팀기프티콘 리스트[1] -> 리스폰스 add
+            for (TeamGifticonEntity teamGifticonEntity : teamGifticonEntities) {
+                allGifticonEntities.add(teamGifticonEntity.getGifticonEntity());
+            }
+        }
+        Page<GifticonEntity> gifticonPage = findFilterGifticonEntities(pageable, user, request, allGifticonEntities);
+        return createPagingResponse(gifticonPage);
+    }
+
+    @Transactional
+    public TeamCreateResponseDto updateTeam(Long teamId, TeamCreateRequestDto teamCreateRequestDto, String email) {
+        UserEntity user = findUser(email);
+        TeamEntity teamEntity = teamRepository.findByTeamId(teamId);
+        checkTeamLeader(teamEntity, user);
+        teamEntity.updateTeam(teamCreateRequestDto);
+        return new TeamCreateResponseDto(teamEntity);
+    }
+
+    @Transactional
+    public TeamCreateResponseDto updateTeamInviteCode(Long teamId, String email) {
+        UserEntity user = findUser(email);
+        TeamEntity teamEntity = teamRepository.findByTeamId(teamId);
+        if(!Objects.equals(teamEntity.getUser().getEmail(), email))
+            throw new ApiException(TeamMessage.TEAM_NOT_LEADER);
+        teamEntity.updateTeamInviteCode(generateInviteCode());
+        return new TeamCreateResponseDto(teamEntity);
+    }
+
+    private Page<GifticonEntity> findFilterGifticonEntities(Pageable pageable, UserEntity user, FilterListDto request, List<GifticonEntity> allGifticonEntities) {
+        return switch (request) {
+            case ALL_NAME_DESC -> new PageImpl<>(allGifticonEntities.stream()
+                    .sorted(Comparator.comparing(GifticonEntity::getName).reversed())
+                    .collect(Collectors.toList()), pageable, allGifticonEntities.size());
+            case ALL_NAME_ASC -> new PageImpl<>(allGifticonEntities.stream()
+                    .sorted(Comparator.comparing(GifticonEntity::getName))
+                    .collect(Collectors.toList()), pageable, allGifticonEntities.size());
+            case ALL_RECENT_EXPIRATION -> new PageImpl<>(allGifticonEntities.stream()
+                    .sorted(Comparator.comparing(GifticonEntity::getDueDate).reversed())
+                    .collect(Collectors.toList()), pageable, allGifticonEntities.size());
+            case All_USABLE_NAME_DESC -> new PageImpl<>(allGifticonEntities.stream()
+                    .filter(gifticonEntity -> gifticonEntity.getStatus() == Status.AVAILABLE)
+                    .sorted(Comparator.comparing(GifticonEntity::getName).reversed())
+                    .collect(Collectors.toList()), pageable, allGifticonEntities.size());
+            case All_USABLE_NAME_ASC -> new PageImpl<>(allGifticonEntities.stream()
+                    .filter(gifticonEntity -> gifticonEntity.getStatus() == Status.AVAILABLE)
+                    .sorted(Comparator.comparing(GifticonEntity::getName))
+                    .collect(Collectors.toList()), pageable, allGifticonEntities.size());
+            case All_USABLE_RECENT_EXPIRATION -> new PageImpl<>(allGifticonEntities.stream()
+                    .filter(gifticonEntity -> gifticonEntity.getStatus() == Status.AVAILABLE)
+                    .sorted(Comparator.comparing(GifticonEntity::getDueDate).reversed())
+                    .collect(Collectors.toList()), pageable, allGifticonEntities.size());
+            case All_USED_NAME_DESC -> new PageImpl<>(allGifticonEntities.stream()
+                    .filter(gifticonEntity -> gifticonEntity.getStatus() == Status.UNAVAILABLE)
+                    .sorted(Comparator.comparing(GifticonEntity::getName).reversed())
+                    .collect(Collectors.toList()), pageable, allGifticonEntities.size());
+            case ALL_USED_NAME_ASC -> new PageImpl<>(allGifticonEntities.stream()
+                    .filter(gifticonEntity -> gifticonEntity.getStatus() == Status.UNAVAILABLE)
+                    .sorted(Comparator.comparing(GifticonEntity::getName))
+                    .collect(Collectors.toList()), pageable, allGifticonEntities.size());
+            case ALL_USED_RECENT_EXPIRATION -> new PageImpl<>(allGifticonEntities.stream()
+                    .filter(gifticonEntity -> gifticonEntity.getStatus() == Status.UNAVAILABLE)
+                    .sorted(Comparator.comparing(GifticonEntity::getDueDate).reversed())
+                    .collect(Collectors.toList()), pageable, allGifticonEntities.size());
+            default -> new PageImpl<>(Collections.emptyList(), pageable, 0);
+        };
+    }
+
+
+    private PageResponse<GifticonListResponse> createPagingResponse(Page<GifticonEntity> gifticonEntities) {
+        List<GifticonListResponse> gifticonResponses = gifticonEntities.stream()
+                .map(GifticonListResponse::new)
+                .collect(Collectors.toList());
+
+        Page<GifticonListResponse> responsePage = new PageImpl<>(gifticonResponses, gifticonEntities.getPageable(), gifticonEntities.getTotalElements());
+
+        return new PageResponse<>(responsePage);
+    }
+
+    private void checkTeamLeader(TeamEntity teamEntity, UserEntity user) {
+        if(!Objects.equals(teamEntity.getUser(), user))
+            throw new ApiException(TeamMessage.TEAM_NOT_LEADER);
+    }
 }

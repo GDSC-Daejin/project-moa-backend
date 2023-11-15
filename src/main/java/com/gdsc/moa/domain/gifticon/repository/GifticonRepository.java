@@ -37,4 +37,19 @@ public interface GifticonRepository extends JpaRepository<GifticonEntity, Long> 
     Long countByUser(UserEntity user);
 
     Long countByUserAndStatus(UserEntity user, Status available);
+
+    @Query("SELECT g FROM GifticonEntity g WHERE g.user = :user ORDER BY g.name DESC")
+    Page<GifticonEntity> findByUserOrderByNameDesc(UserEntity user, Pageable pageable);
+
+    @Query("SELECT g FROM GifticonEntity g WHERE g.user = :user ORDER BY g.name ASC")
+    Page<GifticonEntity> findByUserOrderByNameAsc(UserEntity user, Pageable pageable);
+
+    @Query("SELECT g FROM GifticonEntity g WHERE g.user = :user AND g.status = :status ORDER BY g.name DESC")
+    Page<GifticonEntity> findByUserAndStatusOrderByNameDesc(@Param("user") UserEntity user, @Param("status") Status status, Pageable pageable);
+
+    @Query("SELECT g FROM GifticonEntity g WHERE g.user = :user AND g.status = :status ORDER BY g.name ASC")
+    Page<GifticonEntity> findByUserAndStatusOrderByNameAsc(@Param("user") UserEntity user, @Param("status") Status status, Pageable pageable);
+
+    @Query("SELECT g FROM GifticonEntity g WHERE g.user = :user AND g.status = :status ORDER BY g.dueDate DESC")
+    Page<GifticonEntity> findByUserAndStatusOrderByDueDateDesc(@Param("user") UserEntity user, @Param("status") Status status, Pageable pageable);
 }
