@@ -252,52 +252,42 @@ public class TeamService {
     }
 
     private Page<GifticonEntity> findFilterGifticonEntities(Pageable pageable, UserEntity user, FilterListDto request, List<GifticonEntity> allGifticonEntities) {
-        switch (request) {
-            case ALL_NAME_DESC:
-                return new PageImpl<>(allGifticonEntities.stream()
-                        .sorted(Comparator.comparing(GifticonEntity::getName).reversed())
-                        .collect(Collectors.toList()), pageable, allGifticonEntities.size());
-            case ALL_NAME_ASC:
-                return new PageImpl<>(allGifticonEntities.stream()
-                        .sorted(Comparator.comparing(GifticonEntity::getName))
-                        .collect(Collectors.toList()), pageable, allGifticonEntities.size());
-            case ALL_RECENT_EXPIRATION:
-                return new PageImpl<>(allGifticonEntities.stream()
-                        .sorted(Comparator.comparing(GifticonEntity::getDueDate).reversed())
-                        .collect(Collectors.toList()), pageable, allGifticonEntities.size());
-            case All_USABLE_NAME_DESC:
-                return new PageImpl<>(allGifticonEntities.stream()
-                        .filter(gifticonEntity -> gifticonEntity.getStatus() == Status.AVAILABLE)
-                        .sorted(Comparator.comparing(GifticonEntity::getName).reversed())
-                        .collect(Collectors.toList()), pageable, allGifticonEntities.size());
-            case All_USABLE_NAME_ASC:
-                return new PageImpl<>(allGifticonEntities.stream()
-                        .filter(gifticonEntity -> gifticonEntity.getStatus() == Status.AVAILABLE)
-                        .sorted(Comparator.comparing(GifticonEntity::getName))
-                        .collect(Collectors.toList()), pageable, allGifticonEntities.size());
-            case All_USABLE_RECENT_EXPIRATION:
-                return new PageImpl<>(allGifticonEntities.stream()
-                        .filter(gifticonEntity -> gifticonEntity.getStatus() == Status.AVAILABLE)
-                        .sorted(Comparator.comparing(GifticonEntity::getDueDate).reversed())
-                        .collect(Collectors.toList()), pageable, allGifticonEntities.size());
-            case All_USED_NAME_DESC:
-                return new PageImpl<>(allGifticonEntities.stream()
-                        .filter(gifticonEntity -> gifticonEntity.getStatus() == Status.UNAVAILABLE)
-                        .sorted(Comparator.comparing(GifticonEntity::getName).reversed())
-                        .collect(Collectors.toList()), pageable, allGifticonEntities.size());
-            case ALL_USED_NAME_ASC:
-                return new PageImpl<>(allGifticonEntities.stream()
-                        .filter(gifticonEntity -> gifticonEntity.getStatus() == Status.UNAVAILABLE)
-                        .sorted(Comparator.comparing(GifticonEntity::getName))
-                        .collect(Collectors.toList()), pageable, allGifticonEntities.size());
-            case ALL_USED_RECENT_EXPIRATION:
-                return new PageImpl<>(allGifticonEntities.stream()
-                        .filter(gifticonEntity -> gifticonEntity.getStatus() == Status.UNAVAILABLE)
-                        .sorted(Comparator.comparing(GifticonEntity::getDueDate).reversed())
-                        .collect(Collectors.toList()), pageable, allGifticonEntities.size());
-            default:
-                return new PageImpl<>(Collections.emptyList(), pageable, 0);
-        }
+        return switch (request) {
+            case ALL_NAME_DESC -> new PageImpl<>(allGifticonEntities.stream()
+                    .sorted(Comparator.comparing(GifticonEntity::getName).reversed())
+                    .collect(Collectors.toList()), pageable, allGifticonEntities.size());
+            case ALL_NAME_ASC -> new PageImpl<>(allGifticonEntities.stream()
+                    .sorted(Comparator.comparing(GifticonEntity::getName))
+                    .collect(Collectors.toList()), pageable, allGifticonEntities.size());
+            case ALL_RECENT_EXPIRATION -> new PageImpl<>(allGifticonEntities.stream()
+                    .sorted(Comparator.comparing(GifticonEntity::getDueDate).reversed())
+                    .collect(Collectors.toList()), pageable, allGifticonEntities.size());
+            case All_USABLE_NAME_DESC -> new PageImpl<>(allGifticonEntities.stream()
+                    .filter(gifticonEntity -> gifticonEntity.getStatus() == Status.AVAILABLE)
+                    .sorted(Comparator.comparing(GifticonEntity::getName).reversed())
+                    .collect(Collectors.toList()), pageable, allGifticonEntities.size());
+            case All_USABLE_NAME_ASC -> new PageImpl<>(allGifticonEntities.stream()
+                    .filter(gifticonEntity -> gifticonEntity.getStatus() == Status.AVAILABLE)
+                    .sorted(Comparator.comparing(GifticonEntity::getName))
+                    .collect(Collectors.toList()), pageable, allGifticonEntities.size());
+            case All_USABLE_RECENT_EXPIRATION -> new PageImpl<>(allGifticonEntities.stream()
+                    .filter(gifticonEntity -> gifticonEntity.getStatus() == Status.AVAILABLE)
+                    .sorted(Comparator.comparing(GifticonEntity::getDueDate).reversed())
+                    .collect(Collectors.toList()), pageable, allGifticonEntities.size());
+            case All_USED_NAME_DESC -> new PageImpl<>(allGifticonEntities.stream()
+                    .filter(gifticonEntity -> gifticonEntity.getStatus() == Status.UNAVAILABLE)
+                    .sorted(Comparator.comparing(GifticonEntity::getName).reversed())
+                    .collect(Collectors.toList()), pageable, allGifticonEntities.size());
+            case ALL_USED_NAME_ASC -> new PageImpl<>(allGifticonEntities.stream()
+                    .filter(gifticonEntity -> gifticonEntity.getStatus() == Status.UNAVAILABLE)
+                    .sorted(Comparator.comparing(GifticonEntity::getName))
+                    .collect(Collectors.toList()), pageable, allGifticonEntities.size());
+            case ALL_USED_RECENT_EXPIRATION -> new PageImpl<>(allGifticonEntities.stream()
+                    .filter(gifticonEntity -> gifticonEntity.getStatus() == Status.UNAVAILABLE)
+                    .sorted(Comparator.comparing(GifticonEntity::getDueDate).reversed())
+                    .collect(Collectors.toList()), pageable, allGifticonEntities.size());
+            default -> new PageImpl<>(Collections.emptyList(), pageable, 0);
+        };
     }
 
 
