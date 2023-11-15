@@ -2,6 +2,7 @@ package com.gdsc.moa.domain.gifticon.service;
 
 import com.gdsc.moa.domain.category.entity.CategoryEntity;
 import com.gdsc.moa.domain.category.repository.CategoryRepository;
+import com.gdsc.moa.domain.gifticon.dto.request.FilterListDto;
 import com.gdsc.moa.domain.gifticon.dto.request.GifticonRequestDto;
 import com.gdsc.moa.domain.gifticon.dto.request.GifticonUpdateRequestDto;
 import com.gdsc.moa.domain.gifticon.dto.request.UseMoneyRequestDto;
@@ -96,7 +97,6 @@ public class GifticonService {
     }
 
 
-    // TODO: 10/25/23 리스트들 팀 추가시 수정하기
     @Transactional
     public PageResponse<GifticonListResponse> getUsableGifticon(Pageable pageable, String email) {
         UserEntity user = findUser(email);
@@ -198,6 +198,31 @@ public class GifticonService {
         Page<GifticonListResponse> responsePage = new PageImpl<>(gifticonResponses, gifticonEntities.getPageable(), gifticonEntities.getTotalElements());
 
         return new PageResponse<>(responsePage);
+    }
+
+    @Transactional
+    public PageResponse<GifticonListResponse> getAllRequestGifticonList(FilterListDto request, Pageable pageable, String email) {
+        UserEntity user = findUser(email);
+        Page<GifticonEntity> gifticonEntities;
+        switch (request) {
+            case ALL_NAME_ASC -> gifticonEntities = gifticonRepository.findByUserOrderByNameAsc(user, pageable);
+            case ALL_RECENT_EXPIRATION ->
+                    gifticonEntities = gifticonRepository.findBYUserOrderByDueDateDesc(user, Status.AVAILABLE, pageable);
+            case All_USABLE_NAME_DESC ->
+                    gifticonEntities = gifticonRepository.findByUserAndStatusOrderByNameDesc(user, Status.AVAILABLE, pageable);
+            case All_USABLE_NAME_ASC ->
+                    gifticonEntities = gifticonRepository.findByUserAndStatusOrderByNameAsc(user, Status.AVAILABLE, pageable);
+            case All_USABLE_RECENT_EXPIRATION ->
+                    gifticonEntities = gifticonRepository.findByUserAndStatusOrderByDueDateDesc(user, Status.AVAILABLE, pageable);
+            case All_USED_NAME_DESC ->
+                    gifticonEntities = gifticonRepository.findByUserAndStatusOrderByNameDesc(user, Status.UNAVAILABLE, pageable);
+            case ALL_USED_NAME_ASC ->
+                    gifticonEntities = gifticonRepository.findByUserAndStatusOrderByNameAsc(user, Status.UNAVAILABLE, pageable);
+            case ALL_USED_RECENT_EXPIRATION ->
+                    gifticonEntities = gifticonRepository.findByUserAndStatusOrderByDueDateDesc(user, Status.UNAVAILABLE, pageable);
+            default -> gifticonEntities = gifticonRepository.findByUserOrderByNameDesc(user, pageable);
+        }
+        return createPagingResponse(gifticonEntities);
     }
 
     private GifticonEntity finduserandgifticon(Long gifticonId, String email) {

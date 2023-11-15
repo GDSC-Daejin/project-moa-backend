@@ -1,5 +1,6 @@
 package com.gdsc.moa.domain.gifticon.controller;
 
+import com.gdsc.moa.domain.gifticon.dto.request.FilterListDto;
 import com.gdsc.moa.domain.gifticon.dto.request.GifticonRequestDto;
 import com.gdsc.moa.domain.gifticon.dto.request.GifticonUpdateRequestDto;
 import com.gdsc.moa.domain.gifticon.dto.request.UseMoneyRequestDto;
@@ -148,5 +149,13 @@ public class GifticonController {
         List<TeamListResponseDto> teamList = teamService.getTeamListByGifticon(gifticonId, user.getEmail());
         GifticonDetailResponseDto response = gifticonService.useGifticon(gifticonId, user.getEmail(),teamList);
         return MoaApiResponse.createResponse(response, GifticonMessage.GIFTICON_USE_SUCCESS);
+    }
+
+    @Operation(summary = "개인 기프티콘 각종 목록 조회(필터)")
+    @GetMapping("/list/{request}")
+    public MoaApiResponse<PageResponse<GifticonListResponse>> getAllFilterGifticonList(@PathVariable FilterListDto request, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @AuthenticationPrincipal UserInfo user) {
+        Pageable pageable = PageRequest.of(page, size);
+        PageResponse<GifticonListResponse> response = gifticonService.getAllRequestGifticonList(request, pageable, user.getEmail());
+        return MoaApiResponse.createResponse(response, GifticonMessage.GIFTICON_GET_SUCCESS);
     }
 }
