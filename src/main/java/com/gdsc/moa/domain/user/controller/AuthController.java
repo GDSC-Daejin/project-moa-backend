@@ -1,6 +1,5 @@
 package com.gdsc.moa.domain.user.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.gdsc.moa.domain.user.dto.LogoutRequest;
 import com.gdsc.moa.global.dto.MoaApiResponse;
 import com.gdsc.moa.global.jwt.dto.TokenResponse;
@@ -14,17 +13,19 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
 @Slf4j
+@RequestMapping("/api/v1")
 public class AuthController {
     private final AuthService authService;
 
     @GetMapping("/kakaologin")
-    public MoaApiResponse<TokenResponse> kakaoLogin(String accessToken) throws JsonProcessingException {
-        TokenResponse response = authService.kakaoLogin(accessToken);
+    public MoaApiResponse<TokenResponse> kakaoLogin(String accessToken, String tokenId) {
+        TokenResponse response = authService.kakaoLogin(accessToken, tokenId);
         return MoaApiResponse.createResponse(response, UserMessage.LOGIN_SUCCESS);
     }
 

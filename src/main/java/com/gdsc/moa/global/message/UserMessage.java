@@ -14,7 +14,8 @@ public enum UserMessage implements ResponseMessage {
     LOGOUT_SUCCESS("로그아웃에 성공했습니다.", HttpStatus.OK),
     DELETE_USER_SUCCESS("회원 탈퇴에 성공했습니다.", HttpStatus.OK),
     NICKNAME_UPDATE_SUCCESS("닉네임 변경에 성공했습니다", HttpStatus.OK),
-    USER_INFO_GET_SUCCESS("유저 정보 조회에 성공했습니다.", HttpStatus.OK);
+    USER_INFO_GET_SUCCESS("유저 정보 조회에 성공했습니다.", HttpStatus.OK),
+    REMINDER_DAY_UPDATE_SUCCESS("기프티콘 알림 기한 설정에 성공했습니다.", HttpStatus.OK);
 
     private final String message;
     private final HttpStatus status;

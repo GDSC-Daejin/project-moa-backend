@@ -7,15 +7,17 @@ import com.gdsc.moa.global.dto.MoaApiResponse;
 import com.gdsc.moa.global.jwt.oauth.UserInfo;
 import com.gdsc.moa.global.message.UserMessage;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/api/v1")
 public class UserController {
     private final UserService userService;
 
@@ -31,4 +33,10 @@ public class UserController {
         return MoaApiResponse.createResponse(response, UserMessage.USER_INFO_GET_SUCCESS);
     }
 
+    @PostMapping("/user/reminderday")
+    public MoaApiResponse<Integer> updateReminderDay(@AuthenticationPrincipal UserInfo user,
+                                                @RequestBody int reminderDay) {
+        int response = userService.updateReminderDay(user.getEmail(), reminderDay);
+        return MoaApiResponse.createResponse(response, UserMessage.REMINDER_DAY_UPDATE_SUCCESS);
+    }
 }

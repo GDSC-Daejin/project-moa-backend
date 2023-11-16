@@ -4,6 +4,7 @@ import com.gdsc.moa.domain.category.entity.CategoryEntity;
 import com.gdsc.moa.domain.gifticon.entity.GifticonEntity;
 import com.gdsc.moa.domain.gifticon.entity.Status;
 import com.gdsc.moa.domain.user.entity.UserEntity;
+import java.util.Date;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -52,4 +53,7 @@ public interface GifticonRepository extends JpaRepository<GifticonEntity, Long> 
 
     @Query("SELECT g FROM GifticonEntity g WHERE g.user = :user AND g.status = :status ORDER BY g.dueDate DESC")
     Page<GifticonEntity> findByUserAndStatusOrderByDueDateDesc(@Param("user") UserEntity user, @Param("status") Status status, Pageable pageable);
+
+    @Query("SELECT g FROM GifticonEntity g WHERE g.user = :user AND g.dueDate = :reminderDay")
+    List<GifticonEntity> findByUserAndDueDate(UserEntity user, Date reminderDay);
 }

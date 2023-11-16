@@ -34,4 +34,11 @@ public class UserService {
                 .profileImageUrl(user.getProfileImageUrl())
                 .build();
     }
+
+    public int updateReminderDay(String email, int reminderDay) {
+        UserEntity user = findUserByEmail(email);
+        user.updateReminderDay(reminderDay);
+        userRepository.save(user);
+        return reminderDay;
+    }
 }
