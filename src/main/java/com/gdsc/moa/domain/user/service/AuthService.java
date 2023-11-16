@@ -1,9 +1,11 @@
 package com.gdsc.moa.domain.user.service;
 
 import com.gdsc.moa.domain.user.dto.LogoutRequest;
+import com.gdsc.moa.domain.user.entity.FcmTokenEntity;
 import com.gdsc.moa.domain.user.entity.RefreshTokenEntity;
 import com.gdsc.moa.domain.user.entity.UserEntity;
 import com.gdsc.moa.domain.user.info.impl.KakaoOAuth2UserInfo;
+import com.gdsc.moa.domain.user.repository.FcmTokenRepository;
 import com.gdsc.moa.domain.user.repository.RefreshTokenRepository;
 import com.gdsc.moa.domain.user.repository.UserRepository;
 import com.gdsc.moa.global.exception.ApiException;
@@ -14,7 +16,6 @@ import com.gdsc.moa.domain.user.entity.RoleType;
 import com.gdsc.moa.global.message.UserMessage;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import org.apache.catalina.User;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.stereotype.Service;
@@ -28,16 +29,27 @@ import java.time.Duration;
 public class AuthService {
     private final UserRepository userRepository;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final FcmTokenRepository fcmTokenRepository;
     private final TokenProvider tokenProvider;
 
-    public TokenResponse kakaoLogin(String accessToken) {
+    public TokenResponse kakaoLogin(String accessToken, String tokenId) {
         KakaoOAuth2UserInfo profile = getUserInfoByToken(accessToken);
 
         UserEntity user = userRepository.findByEmail(profile.getEmail())
                 .orElse(profile.createUserEntity());
         userRepository.save(user);
-
+        createOrUpdateToken(user, tokenId);
         return createToken(user);
+    }
+
+    private void createOrUpdateToken(UserEntity user, String tokenId) {
+        Optional<FcmTokenEntity> fcmTokenEntity = fcmTokenRepository.findById(user.getId());
+        if (fcmTokenEntity.isEmpty()) {
+            FcmTokenEntity newFcmTokenEntity = new FcmTokenEntity(user.getId(), tokenId);
+            fcmTokenRepository.save(newFcmTokenEntity);
+            return;
+        }
+        fcmTokenEntity.get().updateToken(tokenId);
     }
 
     private UserEntity findUserByEmail(String email) {

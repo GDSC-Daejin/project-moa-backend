@@ -37,3 +37,4 @@ out/
 .vscode/
 
 application-dev.yml
+/src/main/resources/firebase/gift-moa-1d5c8-firebase-adminsdk-3uhmi-6db0e69e00.json
