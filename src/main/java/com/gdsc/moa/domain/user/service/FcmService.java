@@ -35,7 +35,7 @@ public class FcmService {
     @Value("${fcm.api.url}")
     private String PREFIX_FCM_REQUEST_URL;
     @Value("${firebase.config.path}")
-    private final String FIREBASE_CONFIG_PATH;
+    private String FIREBASE_CONFIG_PATH;
     private final FcmTokenRepository fcmTokenRepository;
     private final ObjectMapper objectMapper;
     private RestTemplate restTemplete;
