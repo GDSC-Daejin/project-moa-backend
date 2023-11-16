@@ -331,6 +331,7 @@ UserEntity user = findUser(email);
         // 사용자의 기프티콘 목록 가져오기
         Page<GifticonEntity> userGifticonPage = gifticonRepository.findAllByUser(user, pageable);
 
+        // TODO: 11/17/23 고민사항 : 쿼리로 짜면 속도 빨라질것 같은데 어렵다... 
         // 팀의 기프티콘 목록 가져오기
         List<GifticonEntity> teamGifticonList = teamGifticonEntity.stream()
                 .map(TeamGifticonEntity::getGifticonEntity).toList();
