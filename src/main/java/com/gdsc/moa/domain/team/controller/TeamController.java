@@ -8,6 +8,7 @@ import com.gdsc.moa.domain.team.dto.request.TeamCreateRequestDto;
 import com.gdsc.moa.domain.team.dto.request.TeamJoinRequestDto;
 import com.gdsc.moa.domain.team.dto.response.ShareTeamGifticonResponseDto;
 import com.gdsc.moa.domain.team.dto.response.TeamCreateResponseDto;
+import com.gdsc.moa.domain.team.dto.response.TeamJoinResponseDto;
 import com.gdsc.moa.domain.team.dto.response.TeamListResponseDto;
 import com.gdsc.moa.domain.team.service.TeamService;
 import com.gdsc.moa.global.dto.MoaApiResponse;
@@ -38,8 +39,8 @@ public class TeamController {
 
     @Operation(summary = "팀 가입하기")
     @PostMapping("/join")
-    public MoaApiResponse<TeamCreateResponseDto> joinTeam(@RequestBody TeamJoinRequestDto teamJoinRequestDto, @AuthenticationPrincipal UserInfo userInfo) {
-        TeamCreateResponseDto response = teamService.joinTeam(teamJoinRequestDto, userInfo.getEmail());
+    public MoaApiResponse<TeamJoinResponseDto> joinTeam(@RequestBody TeamJoinRequestDto teamJoinRequestDto, @AuthenticationPrincipal UserInfo userInfo) {
+        TeamJoinResponseDto response = teamService.joinTeam(teamJoinRequestDto, userInfo.getEmail());
         return MoaApiResponse.createResponse(response, TeamMessage.TEAM_JOIN_SUCCESS);
     }
 

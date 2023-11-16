@@ -10,6 +10,7 @@ import com.gdsc.moa.domain.gifticon.service.GifticonService;
 import com.gdsc.moa.domain.team.dto.request.ShareTeamGifticonRequestDto;
 import com.gdsc.moa.domain.team.dto.request.TeamJoinRequestDto;
 import com.gdsc.moa.domain.team.dto.response.ShareTeamGifticonResponseDto;
+import com.gdsc.moa.domain.team.dto.response.TeamJoinResponseDto;
 import com.gdsc.moa.domain.team.dto.response.TeamListResponseDto;
 import com.gdsc.moa.domain.team.entity.TeamGifticonEntity;
 import com.gdsc.moa.domain.team.entity.TeamUserEntity;
@@ -68,7 +69,7 @@ public class TeamService {
     }
 
     @Transactional
-    public TeamCreateResponseDto joinTeam(TeamJoinRequestDto teamJoinRequestDto, String email) {
+    public TeamJoinResponseDto joinTeam(TeamJoinRequestDto teamJoinRequestDto, String email) {
         UserEntity user = findUser(email);
         TeamEntity teamEntity = findTeamByTeamCode(teamJoinRequestDto.getTeamCode());
         if (isUserAlreadyJoinedTeam(teamEntity, user)) {
@@ -80,7 +81,9 @@ public class TeamService {
         // TeamUser 데이터베이스에 사용자 저장
         teamUserEntity = teamUserRepository.save(teamUserEntity);
 
-        return new TeamCreateResponseDto(teamEntity);
+        List<TeamUserEntity> teamMembers = teamUserRepository.findAllByTeamEntity(teamEntity);
+
+        return new TeamJoinResponseDto(teamEntity,teamMembers);
     }
 
     @Transactional
