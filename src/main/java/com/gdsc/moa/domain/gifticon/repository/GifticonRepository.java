@@ -56,4 +56,7 @@ public interface GifticonRepository extends JpaRepository<GifticonEntity, Long> 
 
     @Query("SELECT g FROM GifticonEntity g WHERE g.user = :user AND g.dueDate = :reminderDay")
     List<GifticonEntity> findByUserAndDueDate(UserEntity user, Date reminderDay);
+
+
+    Page<GifticonEntity> findAllByStatusOrderByUsedDate(Pageable pageable, Status unavailable);
 }

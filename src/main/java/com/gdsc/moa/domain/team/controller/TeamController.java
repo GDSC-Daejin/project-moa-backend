@@ -95,4 +95,12 @@ public class TeamController {
         return MoaApiResponse.createResponse(response, TeamMessage.TEAM_GET_GIFTICON_SUCCESS);
     }
 
+    @Operation(summary = "팀 에서 최근 사용한 기프티콘 리스트")
+    @GetMapping("/gifticon/recent/{teamId}")
+    public MoaApiResponse<PageResponse<GifticonListResponse>> getRecentTeamGifticonList(@PathVariable Long teamId, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @AuthenticationPrincipal UserInfo user) {
+        Pageable pageable = PageRequest.of(page, size);
+        PageResponse<GifticonListResponse> response = teamService.getRecentTeamGifticonList(teamId, pageable, user.getEmail());
+        return MoaApiResponse.createResponse(response, TeamMessage.TEAM_GET_GIFTICON_SUCCESS);
+    }
+
 }

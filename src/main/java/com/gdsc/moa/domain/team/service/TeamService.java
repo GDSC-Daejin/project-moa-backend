@@ -301,6 +301,26 @@ public class TeamService {
         return new PageResponse<>(responsePage);
     }
 
+    @Transactional
+    public PageResponse<GifticonListResponse> getRecentTeamGifticonList(Long teamId, Pageable pageable, String email) {
+UserEntity user = findUser(email);
+        TeamEntity teamEntity = teamRepository.findByTeamId(teamId);
+        List<GifticonEntity> allGifticonEntities = new ArrayList<>();
+        //팀아이디로 팀에속한 유저 가져오기
+        List<TeamUserEntity> teamUserEntities = teamUserRepository.findAllByTeamEntity(teamEntity);
+        //- 반복문 : 팀유저들의 기프티콘 가져오기
+        for (TeamUserEntity teamUserEntity : teamUserEntities) {
+            List<TeamGifticonEntity>teamGifticonEntities = teamGifticonRepository.findAllByTeamUserEntity(teamUserEntity);
+            //- 반복문 : 팀원들의 기프티콘 리스트들 add
+            for (TeamGifticonEntity teamGifticonEntity : teamGifticonEntities) {
+                allGifticonEntities.add(teamGifticonEntity.getGifticonEntity());
+            }
+        }
+        //최근사용한 순으로 정렬하기
+        Page<GifticonEntity> gifticonPage = gifticonRepository.findAllByStatusOrderByUsedDate(pageable, Status.UNAVAILABLE);
+        return createPagingResponse(gifticonPage);
+    }
+
     private void checkTeamLeader(TeamEntity teamEntity, UserEntity user) {
         if(!Objects.equals(teamEntity.getUser(), user))
             throw new ApiException(TeamMessage.TEAM_NOT_LEADER);
