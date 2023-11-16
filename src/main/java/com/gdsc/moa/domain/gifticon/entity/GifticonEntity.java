@@ -46,7 +46,6 @@ public class GifticonEntity {
     private CategoryEntity category;
 
     @OneToMany(mappedBy = "gifticon", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "gifticon_history_id")
     private List<GifticonHistoryEntity> gifticonHistoryEntityList;
 
     @Builder

@@ -7,7 +7,6 @@ import com.gdsc.moa.domain.gifticon.entity.GifticonEntity;
 import com.gdsc.moa.domain.gifticon.entity.Status;
 import com.gdsc.moa.domain.gifticon.repository.GifticonRepository;
 import com.gdsc.moa.domain.gifticon.service.GifticonService;
-import com.gdsc.moa.domain.team.dto.TeamMember;
 import com.gdsc.moa.domain.team.dto.request.ShareTeamGifticonRequestDto;
 import com.gdsc.moa.domain.team.dto.request.TeamJoinRequestDto;
 import com.gdsc.moa.domain.team.dto.response.ShareTeamGifticonResponseDto;
@@ -316,8 +315,33 @@ UserEntity user = findUser(email);
                 allGifticonEntities.add(teamGifticonEntity.getGifticonEntity());
             }
         }
-        //최근사용한 순으로 정렬하기
+       //최근사용한 순으로 정렬하기
         Page<GifticonEntity> gifticonPage = gifticonRepository.findAllByStatusOrderByUsedDate(pageable, Status.UNAVAILABLE);
+        return createPagingResponse(gifticonPage);
+    }
+
+    @Transactional
+    public PageResponse<GifticonListResponse> getNotShareTeamGifticonList(Long teamId, Pageable pageable, String email) {
+        UserEntity user = findUser(email);
+        TeamEntity teamEntity = teamRepository.findByTeamId(teamId);
+        TeamUserEntity teamUserEntity = findTeamUserEntity(teamEntity, user);
+
+        List<TeamGifticonEntity> teamGifticonEntity = teamGifticonRepository.findAllByTeamUserEntity(teamUserEntity);
+
+        // 사용자의 기프티콘 목록 가져오기
+        Page<GifticonEntity> userGifticonPage = gifticonRepository.findAllByUser(user, pageable);
+
+        // 팀의 기프티콘 목록 가져오기
+        List<GifticonEntity> teamGifticonList = teamGifticonEntity.stream()
+                .map(TeamGifticonEntity::getGifticonEntity).toList();
+
+        // 사용자 기프티콘 목록에서 팀 기프티콘을 제외하여 최종 목록 생성
+        List<GifticonEntity> finalGifticonList = userGifticonPage.getContent()
+                .stream()
+                .filter(gifticonEntity -> !teamGifticonList.contains(gifticonEntity)).toList();
+
+        Page<GifticonEntity> gifticonPage = new PageImpl<>(finalGifticonList, pageable, finalGifticonList.size());
+
         return createPagingResponse(gifticonPage);
     }
 

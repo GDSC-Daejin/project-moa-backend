@@ -12,7 +12,6 @@ import com.gdsc.moa.domain.team.dto.response.TeamListResponseDto;
 import com.gdsc.moa.domain.team.service.TeamService;
 import com.gdsc.moa.global.dto.MoaApiResponse;
 import com.gdsc.moa.global.jwt.oauth.UserInfo;
-import com.gdsc.moa.global.message.GifticonMessage;
 import com.gdsc.moa.global.message.TeamMessage;
 import com.gdsc.moa.global.paging.PageResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -100,6 +99,14 @@ public class TeamController {
     public MoaApiResponse<PageResponse<GifticonListResponse>> getRecentTeamGifticonList(@PathVariable Long teamId, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @AuthenticationPrincipal UserInfo user) {
         Pageable pageable = PageRequest.of(page, size);
         PageResponse<GifticonListResponse> response = teamService.getRecentTeamGifticonList(teamId, pageable, user.getEmail());
+        return MoaApiResponse.createResponse(response, TeamMessage.TEAM_GET_GIFTICON_SUCCESS);
+    }
+
+    @Operation(summary = "팀에서 공유안된 자기 기프티콘 리스트")
+    @GetMapping("/gifticon/not_share/{teamId}")
+    public MoaApiResponse<PageResponse<GifticonListResponse>> getNotShareTeamGifticonList(@PathVariable Long teamId, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @AuthenticationPrincipal UserInfo user) {
+        Pageable pageable = PageRequest.of(page, size);
+        PageResponse<GifticonListResponse> response = teamService.getNotShareTeamGifticonList(teamId, pageable, user.getEmail());
         return MoaApiResponse.createResponse(response, TeamMessage.TEAM_GET_GIFTICON_SUCCESS);
     }
 
