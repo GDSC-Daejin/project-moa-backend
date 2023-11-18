@@ -213,6 +213,7 @@ public class TeamService {
     }
 
 
+    @Transactional
     public PageResponse<GifticonListResponse> getAllTeamRequestGifticonList(Long teamId, FilterListDto request, Pageable pageable, String email) {
         UserEntity user = findUser(email);
         //팀
