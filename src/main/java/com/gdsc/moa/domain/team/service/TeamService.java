@@ -7,10 +7,10 @@ import com.gdsc.moa.domain.gifticon.entity.GifticonEntity;
 import com.gdsc.moa.domain.gifticon.entity.Status;
 import com.gdsc.moa.domain.gifticon.repository.GifticonRepository;
 import com.gdsc.moa.domain.gifticon.service.GifticonService;
-import com.gdsc.moa.domain.team.dto.TeamMember;
 import com.gdsc.moa.domain.team.dto.request.ShareTeamGifticonRequestDto;
 import com.gdsc.moa.domain.team.dto.request.TeamJoinRequestDto;
 import com.gdsc.moa.domain.team.dto.response.ShareTeamGifticonResponseDto;
+import com.gdsc.moa.domain.team.dto.response.TeamJoinResponseDto;
 import com.gdsc.moa.domain.team.dto.response.TeamListResponseDto;
 import com.gdsc.moa.domain.team.entity.TeamGifticonEntity;
 import com.gdsc.moa.domain.team.entity.TeamUserEntity;
@@ -69,7 +69,7 @@ public class TeamService {
     }
 
     @Transactional
-    public TeamCreateResponseDto joinTeam(TeamJoinRequestDto teamJoinRequestDto, String email) {
+    public TeamJoinResponseDto joinTeam(TeamJoinRequestDto teamJoinRequestDto, String email) {
         UserEntity user = findUser(email);
         TeamEntity teamEntity = findTeamByTeamCode(teamJoinRequestDto.getTeamCode());
         if (isUserAlreadyJoinedTeam(teamEntity, user)) {
@@ -81,7 +81,9 @@ public class TeamService {
         // TeamUser 데이터베이스에 사용자 저장
         teamUserEntity = teamUserRepository.save(teamUserEntity);
 
-        return new TeamCreateResponseDto(teamEntity);
+        List<TeamUserEntity> teamMembers = teamUserRepository.findAllByTeamEntity(teamEntity);
+
+        return new TeamJoinResponseDto(teamEntity,teamMembers);
     }
 
     @Transactional
@@ -300,6 +302,52 @@ public class TeamService {
         Page<GifticonListResponse> responsePage = new PageImpl<>(gifticonResponses, gifticonEntities.getPageable(), gifticonEntities.getTotalElements());
 
         return new PageResponse<>(responsePage);
+    }
+
+    @Transactional
+    public PageResponse<GifticonListResponse> getRecentTeamGifticonList(Long teamId, Pageable pageable, String email) {
+UserEntity user = findUser(email);
+        TeamEntity teamEntity = teamRepository.findByTeamId(teamId);
+        List<GifticonEntity> allGifticonEntities = new ArrayList<>();
+        //팀아이디로 팀에속한 유저 가져오기
+        List<TeamUserEntity> teamUserEntities = teamUserRepository.findAllByTeamEntity(teamEntity);
+        //- 반복문 : 팀유저들의 기프티콘 가져오기
+        for (TeamUserEntity teamUserEntity : teamUserEntities) {
+            List<TeamGifticonEntity>teamGifticonEntities = teamGifticonRepository.findAllByTeamUserEntity(teamUserEntity);
+            //- 반복문 : 팀원들의 기프티콘 리스트들 add
+            for (TeamGifticonEntity teamGifticonEntity : teamGifticonEntities) {
+                allGifticonEntities.add(teamGifticonEntity.getGifticonEntity());
+            }
+        }
+       //최근사용한 순으로 정렬하기
+        Page<GifticonEntity> gifticonPage = gifticonRepository.findAllByStatusOrderByUsedDate(pageable, Status.UNAVAILABLE);
+        return createPagingResponse(gifticonPage);
+    }
+
+    @Transactional
+    public PageResponse<GifticonListResponse> getNotShareTeamGifticonList(Long teamId, Pageable pageable, String email) {
+        UserEntity user = findUser(email);
+        TeamEntity teamEntity = teamRepository.findByTeamId(teamId);
+        TeamUserEntity teamUserEntity = findTeamUserEntity(teamEntity, user);
+
+        List<TeamGifticonEntity> teamGifticonEntity = teamGifticonRepository.findAllByTeamUserEntity(teamUserEntity);
+
+        // 사용자의 기프티콘 목록 가져오기
+        Page<GifticonEntity> userGifticonPage = gifticonRepository.findAllByUser(user, pageable);
+
+        // TODO: 11/17/23 고민사항 : 쿼리로 짜면 속도 빨라질것 같은데 어렵다... 
+        // 팀의 기프티콘 목록 가져오기
+        List<GifticonEntity> teamGifticonList = teamGifticonEntity.stream()
+                .map(TeamGifticonEntity::getGifticonEntity).toList();
+
+        // 사용자 기프티콘 목록에서 팀 기프티콘을 제외하여 최종 목록 생성
+        List<GifticonEntity> finalGifticonList = userGifticonPage.getContent()
+                .stream()
+                .filter(gifticonEntity -> !teamGifticonList.contains(gifticonEntity)).toList();
+
+        Page<GifticonEntity> gifticonPage = new PageImpl<>(finalGifticonList, pageable, finalGifticonList.size());
+
+        return createPagingResponse(gifticonPage);
     }
 
     private void checkTeamLeader(TeamEntity teamEntity, UserEntity user) {

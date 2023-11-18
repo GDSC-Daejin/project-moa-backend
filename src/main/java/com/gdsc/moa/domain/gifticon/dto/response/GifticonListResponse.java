@@ -9,6 +9,8 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 public class GifticonListResponse {
@@ -18,11 +20,12 @@ public class GifticonListResponse {
     private String exchangePlace;
     private Date dueDate;
     private GifticonType gifticonType;
+    private String gifticonMoney;
     private Status status;
     private Date usedDate;
     private AuthorDto author;
     private CategoryResponseDto category;
-
+    private List<GifticonHistoryResponseDto> gifticonHistories;
 
     @Builder
     public GifticonListResponse(GifticonEntity gifticonEntity){
@@ -32,6 +35,7 @@ public class GifticonListResponse {
         this.exchangePlace = gifticonEntity.getExchangePlace();
         this.dueDate = gifticonEntity.getDueDate();
         this.gifticonType = gifticonEntity.getGifticonType();
+        this.gifticonMoney = gifticonEntity.getGifticonMoney();
         this.status = gifticonEntity.getStatus();
         this.usedDate = gifticonEntity.getUsedDate();
         this.author = AuthorDto.builder()
@@ -43,6 +47,14 @@ public class GifticonListResponse {
                 .id(gifticonEntity.getCategory().getId())
                 .categoryName(gifticonEntity.getCategory().getCategoryName())
                 .build();
+        this.gifticonHistories = gifticonEntity.getGifticonHistoryEntityList().stream()
+                .map(historyEntity -> GifticonHistoryResponseDto.builder()
+                        .id(historyEntity.getId())
+                        .usedPrice(historyEntity.getUsedPrice())
+                        .leftPrice(historyEntity.getLeftPrice())
+                        .usedDate(historyEntity.getUsedDate())
+                        .build())
+                .collect(Collectors.toList());
     }
 }
 

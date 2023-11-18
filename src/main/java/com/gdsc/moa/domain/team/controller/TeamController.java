@@ -8,11 +8,11 @@ import com.gdsc.moa.domain.team.dto.request.TeamCreateRequestDto;
 import com.gdsc.moa.domain.team.dto.request.TeamJoinRequestDto;
 import com.gdsc.moa.domain.team.dto.response.ShareTeamGifticonResponseDto;
 import com.gdsc.moa.domain.team.dto.response.TeamCreateResponseDto;
+import com.gdsc.moa.domain.team.dto.response.TeamJoinResponseDto;
 import com.gdsc.moa.domain.team.dto.response.TeamListResponseDto;
 import com.gdsc.moa.domain.team.service.TeamService;
 import com.gdsc.moa.global.dto.MoaApiResponse;
 import com.gdsc.moa.global.jwt.oauth.UserInfo;
-import com.gdsc.moa.global.message.GifticonMessage;
 import com.gdsc.moa.global.message.TeamMessage;
 import com.gdsc.moa.global.paging.PageResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -39,8 +39,8 @@ public class TeamController {
 
     @Operation(summary = "팀 가입하기")
     @PostMapping("/join")
-    public MoaApiResponse<TeamCreateResponseDto> joinTeam(@RequestBody TeamJoinRequestDto teamJoinRequestDto, @AuthenticationPrincipal UserInfo userInfo) {
-        TeamCreateResponseDto response = teamService.joinTeam(teamJoinRequestDto, userInfo.getEmail());
+    public MoaApiResponse<TeamJoinResponseDto> joinTeam(@RequestBody TeamJoinRequestDto teamJoinRequestDto, @AuthenticationPrincipal UserInfo userInfo) {
+        TeamJoinResponseDto response = teamService.joinTeam(teamJoinRequestDto, userInfo.getEmail());
         return MoaApiResponse.createResponse(response, TeamMessage.TEAM_JOIN_SUCCESS);
     }
 
@@ -92,6 +92,22 @@ public class TeamController {
     public MoaApiResponse<PageResponse<GifticonListResponse>> getAllTeamGifticonList(@PathVariable FilterListDto request, @PathVariable Long teamId, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @AuthenticationPrincipal UserInfo user) {
         Pageable pageable = PageRequest.of(page, size);
         PageResponse<GifticonListResponse> response = teamService.getAllTeamRequestGifticonList(teamId, request, pageable, user.getEmail());
+        return MoaApiResponse.createResponse(response, TeamMessage.TEAM_GET_GIFTICON_SUCCESS);
+    }
+
+    @Operation(summary = "팀 에서 최근 사용한 기프티콘 리스트")
+    @GetMapping("/gifticon/recent/{teamId}")
+    public MoaApiResponse<PageResponse<GifticonListResponse>> getRecentTeamGifticonList(@PathVariable Long teamId, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @AuthenticationPrincipal UserInfo user) {
+        Pageable pageable = PageRequest.of(page, size);
+        PageResponse<GifticonListResponse> response = teamService.getRecentTeamGifticonList(teamId, pageable, user.getEmail());
+        return MoaApiResponse.createResponse(response, TeamMessage.TEAM_GET_GIFTICON_SUCCESS);
+    }
+
+    @Operation(summary = "팀에서 공유안된 자기 기프티콘 리스트")
+    @GetMapping("/gifticon/not_share/{teamId}")
+    public MoaApiResponse<PageResponse<GifticonListResponse>> getNotShareTeamGifticonList(@PathVariable Long teamId, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @AuthenticationPrincipal UserInfo user) {
+        Pageable pageable = PageRequest.of(page, size);
+        PageResponse<GifticonListResponse> response = teamService.getNotShareTeamGifticonList(teamId, pageable, user.getEmail());
         return MoaApiResponse.createResponse(response, TeamMessage.TEAM_GET_GIFTICON_SUCCESS);
     }
 

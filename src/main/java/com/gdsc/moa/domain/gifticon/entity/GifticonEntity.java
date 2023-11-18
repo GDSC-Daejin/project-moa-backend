@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.BatchSize;
 
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Entity
@@ -43,6 +44,9 @@ public class GifticonEntity {
     @ManyToOne
     @JoinColumn(name = "category_id")
     private CategoryEntity category;
+
+    @OneToMany(mappedBy = "gifticon", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<GifticonHistoryEntity> gifticonHistoryEntityList;
 
     @Builder
     public GifticonEntity(String name,
@@ -127,9 +131,6 @@ public class GifticonEntity {
         this.status = Status.AVAILABLE;
         this.usedDate = null;
     }
-
-
-    //TODO: 10/15/23  사용한 유저 map 으로 json형식으로 만들기
 
 
 }
