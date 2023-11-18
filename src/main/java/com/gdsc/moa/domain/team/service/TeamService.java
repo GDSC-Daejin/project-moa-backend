@@ -28,6 +28,7 @@ import com.gdsc.moa.global.message.TeamMessage;
 import com.gdsc.moa.global.message.UserMessage;
 import com.gdsc.moa.global.paging.PageResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -39,6 +40,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class TeamService {
     private final TeamRepository teamRepository;
     private final UserRepository userRepository;
@@ -306,21 +308,31 @@ public class TeamService {
 
     @Transactional
     public PageResponse<GifticonListResponse> getRecentTeamGifticonList(Long teamId, Pageable pageable, String email) {
-UserEntity user = findUser(email);
+        UserEntity user = findUser(email);
         TeamEntity teamEntity = teamRepository.findByTeamId(teamId);
+
         List<GifticonEntity> allGifticonEntities = new ArrayList<>();
+
         //팀아이디로 팀에속한 유저 가져오기
         List<TeamUserEntity> teamUserEntities = teamUserRepository.findAllByTeamEntity(teamEntity);
+        log.info("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!teamUserEntities : {}", teamUserEntities.stream().toList());
+
         //- 반복문 : 팀유저들의 기프티콘 가져오기
         for (TeamUserEntity teamUserEntity : teamUserEntities) {
             List<TeamGifticonEntity>teamGifticonEntities = teamGifticonRepository.findAllByTeamUserEntity(teamUserEntity);
+            log.info("@@@@@@@@@@@@@@@@@teamGifticonEntities : {}", teamGifticonEntities.stream().toList());
             //- 반복문 : 팀원들의 기프티콘 리스트들 add
             for (TeamGifticonEntity teamGifticonEntity : teamGifticonEntities) {
                 allGifticonEntities.add(teamGifticonEntity.getGifticonEntity());
+                log.info("####################allGifticonEntities : {}", allGifticonEntities.stream().toList());
             }
         }
        //최근사용한 순으로 정렬하기
-        Page<GifticonEntity> gifticonPage = gifticonRepository.findAllByStatusOrderByUsedDate(pageable, Status.UNAVAILABLE);
+        allGifticonEntities = allGifticonEntities.stream()
+                .filter(gifticonEntity -> Objects.nonNull(gifticonEntity.getUsedDate()))
+                .sorted(Comparator.comparing(GifticonEntity::getUsedDate).reversed())
+                .collect(Collectors.toList());
+        Page<GifticonEntity> gifticonPage = new PageImpl<>(allGifticonEntities, pageable, allGifticonEntities.size());
         return createPagingResponse(gifticonPage);
     }
 
