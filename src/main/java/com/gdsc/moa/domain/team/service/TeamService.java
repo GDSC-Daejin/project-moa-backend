@@ -111,7 +111,7 @@ public class TeamService {
     @Transactional
     public void leaveTeam(Long teamId, String email) {
         UserEntity user = findUser(email);
-        TeamEntity teamEntity = findTeamByTeamCode(teamId.toString());
+        TeamEntity teamEntity = teamRepository.findByTeamId(teamId);
         TeamUserEntity teamUserEntity = findTeamUserEntity(teamEntity, user);
         //방장일 경우
         if(Objects.equals(teamEntity.getUser().getEmail(), email))
