@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Entity
 @Getter
 @NoArgsConstructor
@@ -21,6 +23,9 @@ public class TeamUserEntity {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private UserEntity userEntity;
+
+    @OneToMany(mappedBy = "teamUserEntity", cascade = CascadeType.ALL)
+    private List<TeamGifticonEntity> teamGifticonEntities;
 
     public TeamUserEntity(TeamEntity team, UserEntity user) {
         this.teamEntity = team;

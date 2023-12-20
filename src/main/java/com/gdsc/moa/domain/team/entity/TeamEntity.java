@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Entity
 @Getter
 @NoArgsConstructor
@@ -24,6 +26,9 @@ public class TeamEntity {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private UserEntity user;
+
+    @OneToMany(mappedBy = "teamEntity", cascade = CascadeType.ALL)
+    private List<TeamUserEntity> teamUsers;
 
 
     public TeamEntity(TeamCreateRequestDto teamCreateRequestDto, UserEntity user, String inviteCode) {

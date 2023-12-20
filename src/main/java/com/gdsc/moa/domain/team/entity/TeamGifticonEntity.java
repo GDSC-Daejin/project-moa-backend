@@ -1,7 +1,6 @@
 package com.gdsc.moa.domain.team.entity;
 
 import com.gdsc.moa.domain.gifticon.entity.GifticonEntity;
-import com.gdsc.moa.domain.user.entity.UserEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
