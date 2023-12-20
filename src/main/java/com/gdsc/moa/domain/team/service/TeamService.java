@@ -116,7 +116,6 @@ public class TeamService {
         //방장일 경우
         if(Objects.equals(teamEntity.getUser().getEmail(), email))
             teamRepository.delete(teamEntity);
-        // TODO: 10/31/23 cascade 
         teamUserRepository.delete(teamUserEntity);
     }
 

@@ -15,4 +15,6 @@ public interface CategoryRepository extends JpaRepository<CategoryEntity, Long> 
     List<CategoryEntity> findAllByUser(UserEntity user);
 
     Optional<CategoryEntity> findByUserAndCategoryName(UserEntity user, String 미분류);
+
+    Optional<CategoryEntity> findByCategoryNameAndUser(String changeCategoryName, UserEntity user);
 }
