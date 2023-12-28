@@ -22,7 +22,7 @@ public class SwaggerConfig {
         server.description("moa");
 
         Server localServer = new Server();
-        localServer.setUrl("http://localhost:8080/swagger-ui/index.html");
+        localServer.setUrl("http://localhost:8080");
         localServer.description("local");
 
         return new OpenAPI()
