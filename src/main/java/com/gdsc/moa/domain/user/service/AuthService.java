@@ -19,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.netty.http.client.HttpClient;
 
@@ -38,11 +39,11 @@ public class AuthService {
         UserEntity user = userRepository.findByEmail(profile.getEmail())
                 .orElse(profile.createUserEntity());
         userRepository.save(user);
-        createOrUpdateToken(user, tokenId);
+        createOrUpdatFcmToken(user, tokenId);
         return createToken(user);
     }
 
-    private void createOrUpdateToken(UserEntity user, String tokenId) {
+    private void createOrUpdatFcmToken(UserEntity user, String tokenId) {
         Optional<FcmTokenEntity> fcmTokenEntity = fcmTokenRepository.findById(user.getId());
         if (fcmTokenEntity.isEmpty()) {
             FcmTokenEntity newFcmTokenEntity = new FcmTokenEntity(user.getId(), tokenId);
@@ -56,7 +57,9 @@ public class AuthService {
         return userRepository.findByEmail(email)
                 .orElse(null);
     }
-    private TokenResponse createToken(UserEntity user) {
+
+    @Transactional
+    TokenResponse createToken(UserEntity user) {
         TokenResponse tokenResponse = tokenProvider.generateJwtToken(user.getEmail(), user.getNickname(), RoleType.MEMBER);
         RefreshTokenEntity refreshTokenEntity = checkExistingRefreshToken(user.getId());
 
@@ -86,14 +89,18 @@ public class AuthService {
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, "application/x-www-form-urlencoded;charset=utf-8")
                 .clientConnector(new ReactorClientHttpConnector(HttpClient.newConnection().responseTimeout(Duration.ofSeconds(5))))
                 .build();
+        try {
+            KakaoUserResponse kakaoProfile = webClient.post()
+                    .uri("/v2/user/me")
+                    .retrieve()
+                    .bodyToMono(KakaoUserResponse.class)
+                    .block();
+            return new KakaoOAuth2UserInfo(kakaoProfile);
+        }
+        catch (Exception e) {
+            throw new ApiException(UserMessage.KAKAO_LOGIN_FAILED);
+        }
 
-        KakaoUserResponse kakaoProfile = webClient.post()
-                .uri("/v2/user/me")
-                .retrieve()
-                .bodyToMono(KakaoUserResponse.class)
-                .block();
-
-        return new KakaoOAuth2UserInfo(kakaoProfile);
     }
 
     public TokenResponse reissue(String email, LogoutRequest logoutRequest) {
