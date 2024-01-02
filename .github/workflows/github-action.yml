@@ -49,7 +49,7 @@ jobs:
         key: ${{ secrets.KEY }}
         port: 50022
         script: |
-          cd /home/jsangmin/moa
+          cd /home/jsangmin/docker/moa
           docker-compose down --rmi local
           docker pull ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }}:app
           docker-compose up -d
