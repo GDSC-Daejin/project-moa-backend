@@ -55,7 +55,10 @@ public class SecurityConfig {
             )
             //권한 설정
             .authorizeHttpRequests(httpRequest ->
-                    httpRequest.requestMatchers(new MvcRequestMatcher(introspector, "/**/user/**")).authenticated()
+                    httpRequest
+                            .requestMatchers(new MvcRequestMatcher(introspector, "/**/auth/**")).authenticated()
+                            .requestMatchers(new MvcRequestMatcher(introspector, "/**/user/**")).authenticated()
+                            .requestMatchers(new MvcRequestMatcher(introspector, "/**/gifticon/**")).authenticated()
                             .anyRequest().permitAll())
             // JwtFilter 를 addFilterBefore 로 등록했던 JwtSecurityConfig 클래스를 적용
             .apply(new JwtFilterConfig(tokenProvider));
