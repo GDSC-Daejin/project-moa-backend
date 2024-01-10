@@ -19,18 +19,18 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/")
 public class AuthController {
     private final AuthService authService;
 
-    @GetMapping("/kakaologin")
+    @GetMapping("kakaologin")
     public MoaApiResponse<TokenResponse> kakaoLogin(String accessToken, String tokenId) {
         TokenResponse response = authService.kakaoLogin(accessToken, tokenId);
         return MoaApiResponse.createResponse(response, UserMessage.LOGIN_SUCCESS);
     }
 
     @Operation(summary = "토큰 재발급 API", description = "AccessToken 만료 시 RefreshToken을 가지고 AccessToken, RefreshToken을 재발급 받을 수 있습니다.")
-    @PostMapping("/token")
+    @PostMapping("auth/token")
     public MoaApiResponse<TokenResponse> reissue(@AuthenticationPrincipal UserInfo user,
                                                  @RequestBody LogoutRequest logoutRequest){
         TokenResponse response = authService.reissue(user.getEmail(), logoutRequest);
