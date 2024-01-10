@@ -2,6 +2,7 @@ package com.gdsc.moa.domain.category.service;
 
 import com.gdsc.moa.domain.category.dto.CategoryCreateResponseDto;
 import com.gdsc.moa.domain.category.dto.CategoryResponseDto;
+import com.gdsc.moa.domain.category.dto.CategoryUpdateRequestDto;
 import com.gdsc.moa.domain.category.entity.CategoryEntity;
 import com.gdsc.moa.domain.category.repository.CategoryRepository;
 import com.gdsc.moa.domain.user.entity.UserEntity;
@@ -50,5 +51,18 @@ public class CategoryService {
 
     public UserEntity findUser(String email) {
         return userRepository.findByEmail(email).orElseThrow(() -> new ApiException(UserMessage.USER_NOT_FOUND));
+    }
+
+
+    public CategoryResponseDto updateCategory(CategoryUpdateRequestDto requestDto, String email) {
+        UserEntity user = findUser(email);
+        CategoryEntity categoryEntity = categoryRepository.findById(requestDto.getOriginalId()).orElseThrow(() -> new ApiException(GifticonMessage.CATEGORY_NOT_FOUND));
+        CategoryEntity categoryName = categoryRepository.findByCategoryNameAndUser(requestDto.getChangeCategoryName(), user).orElseThrow(() -> new ApiException(GifticonMessage.CATEGORY_ALREADY_EXIST));
+        if (requestDto.getChangeCategoryName().equals(categoryEntity.getCategoryName())) {
+            throw new ApiException(GifticonMessage.CATEGORY_DUPLICATE);
+        }
+        categoryEntity.updateCategory(requestDto.getChangeCategoryName(), user);
+        categoryEntity = categoryRepository.save(categoryEntity);
+        return new CategoryResponseDto(categoryEntity.getId(), categoryEntity.getCategoryName());
     }
 }
